@@ -4,9 +4,11 @@ For the CS 320 Class at UMass
 
 # golang-vagrant
 
-Before you can do anything, you need to set the password for the vm (if you havent already done so)
+The first step is to get the vagrant up and ssh into it:
 ```
-sudo passwd ubuntu
+vagrant up
+...
+vagrant ssh
 ```
 
 ### Cassandra Basics
