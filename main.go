@@ -14,6 +14,7 @@ type Env struct {
 
 func main() {
 	session, err := DB.NewDBSession()
+	defer session.Close()
 	if err != nil {
 		log.Fatal(err)
 		return
