@@ -28,7 +28,7 @@ Vagrant.configure("2") do |config|
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine and only allow access
   # via 127.0.0.1 to disable public access
-  config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 8081, host: 8081, host_ip: "127.0.0.1"
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -43,19 +43,19 @@ Vagrant.configure("2") do |config|
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-  config.vm.synced_folder ENV['GOPATH'], "/home/vagrant/.gvm/pkgsets/go1.11.1/global/"
+  config.vm.synced_folder ENV['GOPATH'], "/home/vagrant/go"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  # config.vm.provider "virtualbox" do |vb|
+  config.vm.provider "virtualbox" do |vb|
   #   # Display the VirtualBox GUI when booting the machine
   #   vb.gui = true
   #
   #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
+    vb.memory = "2048"
+  end
   #
   # View the documentation for the provider you are using for more
   # information on available options.
@@ -68,7 +68,8 @@ Vagrant.configure("2") do |config|
     sudo apt-get install curl git mercurial make binutils bison gcc openjdk-8-jdk python2.7 -y
     bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
     echo "source /home/vagrant/.gvm/scripts/gvm" >> /home/vagrant/.bashrc
-    source /home/vagrant/.gvm/scripts/gvm
+    echo "export GOPATH=/home/vagrant/go" >> /home/vagrant/.bashrc
+    source /home/vagrant/.bashrc
     gvm install go1.11.1 -B
     gvm use go1.11.1 --default
     go version
