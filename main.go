@@ -1,48 +1,47 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"ratdevelopment-backend/DB"
-	"strings"
 )
 
-type Env struct {
-	session DB.FileBrowserDBSession
+var (
+	Trace   *log.Logger
+	Info    *log.Logger
+	Warning *log.Logger
+	Error   *log.Logger
+)
+
+func init() {
+
+	Trace = log.New(os.Stdout,
+		"TRACE: ",
+		log.Ldate|log.Ltime|log.Lshortfile)
+
+	Info = log.New(os.Stdout,
+		"INFO: ",
+		log.Ldate|log.Ltime|log.Lshortfile)
+
+	Warning = log.New(os.Stdout,
+		"WARNING: ",
+		log.Ldate|log.Ltime|log.Lshortfile)
+
+	Error = log.New(os.Stderr,
+		"ERROR: ",
+		log.Ldate|log.Ltime|log.Lshortfile)
 }
 
 func main() {
 	session, err := DB.NewDBSession()
 	defer session.Close()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err.Error())
 		return
 	}
 	env := &Env{session: session}
 	//http.Handle("/", http.FileServer(http.Dir("./dist")))
 	http.HandleFunc("/GetLatestSnapshotsByTenant", env.handleGetLatestSnapshotsByTenant)
 	log.Fatal(http.ListenAndServe(":8081", nil))
-}
-
-func (env *Env) handleGetLatestSnapshotsByTenant(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	tenant := r.URL.Query().Get("tenant")
-	if len(tenant) == 0 {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	snapshots, err := env.session.GetLatestSnapshotsByTenant(tenant)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-
-	fmt.Fprintf(w, "[%s]", strings.Join(snapshots, ","))
 }
