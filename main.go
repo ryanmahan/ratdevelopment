@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"ratdevelopment-backend/DB"
+	"./DB"
 )
 
 var (
