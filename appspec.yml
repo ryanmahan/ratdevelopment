@@ -1,0 +1,14 @@
+version: 0.0
+os: linux
+files:
+  - source: /app
+    destination: /opt
+hooks:
+  BeforeInstall:
+    - location: deployScripts/BeforeInstall.sh
+  AfterInstall:
+    - location: deployScripts/AfterInstall.sh
+  ApplicationStart:
+    - location: deployScripts/ApplicationStart.sh
+  ValidateService:
+    - location: deployScripts/ValidateService.sh
