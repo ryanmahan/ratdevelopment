@@ -1,8 +1,5 @@
 version: 0.0
 os: linux
-files:
-  - source: /app
-    destination: /opt
 hooks:
   BeforeInstall:
     - location: deployScripts/BeforeInstall.sh
