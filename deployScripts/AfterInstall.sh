@@ -1,1 +1,1 @@
-docker build -t ratdevelopment-backend .
+docker build -t ratdevelopment-backend /$HOME/go/src/ratdevelopment-backend
