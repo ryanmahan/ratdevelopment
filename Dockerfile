@@ -1,8 +1,8 @@
-FROM golang:latest AS builder
-RUN mkdir /ratdevelopment-latest
-ADD . /ratdevelopment-latest/
-WORKDIR /ratdevelopment-latest
+FROM golang:alpine AS builder
+RUN mkdir -p /go/src/ratdevelopment-backend
+ADD . /go/src/ratdevelopment-backend/
+WORKDIR /go/src/ratdevelopment-backend
 
 RUN go get
 RUN go build -o main .
-CMD ["/app/main"]
+CMD ["./main"]
