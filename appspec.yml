@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ec2-user/go/src/ratdevelopment-backend
+    destination: /go/src/ratdevelopment-backend
 hooks:
   BeforeInstall:
     - location: deployScripts/BeforeInstall.sh
