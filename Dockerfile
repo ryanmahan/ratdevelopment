@@ -1,4 +1,4 @@
-FROM golang:alpine AS builder
+FROM golang:latest AS builder
 RUN mkdir -p /go/src/ratdevelopment-backend
 ADD . /go/src/ratdevelopment-backend/
 WORKDIR /go/src/ratdevelopment-backend
