@@ -1,6 +1,7 @@
 # Created by Users
 ratdevelopment-backend
 *.log
+main
 
 # Created by https://www.gitignore.io/api/go,vagrant,executable,jetbrains+all
 

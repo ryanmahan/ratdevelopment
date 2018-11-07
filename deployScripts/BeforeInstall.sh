@@ -1,5 +1,4 @@
-docker stop ratdev-application
-docker rm ratdev-application
-docker stop cdaemon
-docker rm cdaemon
-docker run --name cdaemon -d cassandra:latest
+#!/bin/sh
+service cassandra stop
+service cassandra start
+cqlsh init.cql
