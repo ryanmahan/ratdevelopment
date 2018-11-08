@@ -1,3 +1,5 @@
 #!/bin/bash
 # Migrate the schema to the Cassandra DB
-cqlsh --file '/home/vagrant/go/schema.cql'
+# Resolve the directory of this script
+SCRIPT_DIR=$(dirname $(readlink -f "$0"))
+cqlsh --file "$SCRIPT_DIR/schema.cql"
