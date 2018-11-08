@@ -11,7 +11,7 @@ vagrant up
 vagrant ssh
 ```
 
-### Cassandra Basics
+## Cassandra Basics
 
 Cassandra should typically start when your machine starts
 But if it isnt running, just use the following to start it
@@ -29,6 +29,16 @@ Do note that you cant use GoCQL to mess with the schema at all, that has to be d
 ```
 cqlsh
 ```
+
+### Automatic schema setup
+
+To get your database set up for the first time, run
+```bash
+./scripts/migrate.sh
+```
+which will run the cql in schema.cql on your local cassandra database.
+
+### Manual schema setup
 
 First your going to have to create is a keyspace
 I'm going to recomend the following:
