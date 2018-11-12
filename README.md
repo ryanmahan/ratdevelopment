@@ -14,6 +14,15 @@ The first step is to get the Vagrant virtual machine running. This command will 
 vagrant up
 ```
 
+Make sure you have [go installed on your machine](https://golang.org/doc/install).
+
+Clone this repository into your Go path. The repository should end up in `$GOPATH/src/ratdevelopment-backend`.
+
+To get Go package dependencies for the branch you are on run:
+```
+go get
+```
+
 After the vagrant machine starts up to run all the tests for the repository, run:
 ```
 go test ./...
@@ -29,7 +38,7 @@ To compile the local go server run:
 go build
 ```
 
-To start the local go server run:
+To start the local go server after you have compiled run:
 #### On Windows:
 ```
 ratdevelopment-backend
