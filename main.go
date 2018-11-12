@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -31,10 +32,14 @@ func init() {
 	Error = log.New(os.Stderr,
 		"ERROR: ",
 		log.Ldate|log.Ltime|log.Lshortfile)
+	flag.StringVar(&hostIPs, "cassandra_ips", "10.10.10.31", "Pass the ips of the cassandra hosts")
+	flag.Parse()
 }
 
+var hostIPs string
+
 func main() {
-	session, err := DB.NewDBSession()
+	session, err := DB.NewDBSession(hostIPs)
 	if err != nil {
 		log.Fatal(err.Error())
 		return
