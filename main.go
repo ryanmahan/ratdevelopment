@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"./DB"
+	"ratdevelopment-backend/DB"
 )
 
 var (
@@ -35,11 +35,11 @@ func init() {
 
 func main() {
 	session, err := DB.NewDBSession()
-	defer session.Close()
 	if err != nil {
 		log.Fatal(err.Error())
 		return
 	}
+	defer session.Close()
 	env := &Env{session: session}
 	//http.Handle("/", http.FileServer(http.Dir("./dist")))
 	http.HandleFunc("/GetLatestSnapshotsByTenant", env.handleGetLatestSnapshotsByTenant)
