@@ -8,7 +8,7 @@ import (
 type FileBrowserDBSession interface {
 	GetLatestSnapshotsByTenant(string) ([]string, error)
 	GetTimedSystemSnapshotByTenant(string, string, int) (string, error)
-	GetValidTimestampsOfSystem(string, int, int, int) ([]string, error)
+	GetValidTimestampsOfSystem(string, int) ([]time.Time, error)
 }
 
 //GetLatestSnapshotsByTenant returns slice of JSON blobs for the latest snapshots of all systems owned by a tenant
