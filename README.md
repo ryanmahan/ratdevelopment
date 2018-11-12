@@ -2,7 +2,12 @@
 
 For the CS 320 Class at UMass
 
-# Quick Start
+## Quick Start
+
+If the `Vagrantfile` has been changed since you last ran `vagrant up`, you should run:
+```
+vagrant destroy
+```
 
 The first step is to get the Vagrant virtual machine running. This command will start the Vagrant machine which is configured to be a Cassandra node:
 ```
@@ -17,6 +22,29 @@ go test ./...
 Optionally add `-bench .` or `-bench=.` to run the benchmarking tests, or add `-v` for verbose output, such as:
 ```
 go test ./... -v -bench .
+```
+
+To compile the local go server run:
+```
+go build
+```
+
+To start the local go server run:
+#### On Windows:
+```
+ratdevelopment-backend
+```
+A permission dialog might also pop up, make sure to allow `ratdevelopment-backend` to access the network.
+
+#### On Unix:
+```
+./ratdevelopment-backend
+```
+
+## Before Editing
+Make sure you set your line endings properly in git:
+```
+git confit core.autocrlf "input"
 ```
 
 ## Vagrant Info
