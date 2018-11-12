@@ -3,19 +3,13 @@
 
 require 'fileutils'
 
-CONFIG = File.join(File.dirname(__FILE__), File.join("cassandra","config.rb"))
-
 # config.rb defaults
-$instances = 3
+$instances = 1
 $instance_name_prefix = "cassandra"
 $vm_memory = 1024
 $vm_cpus = 1
 $vm_cpuexecutioncap = 50
 $forwarded_ports = {}
-
-if File.exist?(CONFIG)
-  require CONFIG
-end
 
 Vagrant.configure("2") do |config|
 
