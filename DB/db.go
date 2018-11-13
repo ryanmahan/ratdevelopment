@@ -15,8 +15,8 @@ func NewDBSession(hosts ...string) (*DatabaseSession, error) {
 	//log.Printf("Cassandra IPs: %s", strings.Join(hosts, ", "))
 	db := gocql.NewCluster(hosts...)
 	db.ProtoVersion = 4
-	db.ConnectTimeout = 30 * time.Second
-	db.Timeout = 30 * time.Second
+	db.ConnectTimeout = 30 * time.Second //timeout to connect to the cassandra instance
+	db.Timeout = 30 * time.Second        //timeout for queries
 	db.Keyspace = "defaultks"
 	session, err := db.CreateSession()
 	if err != nil {
