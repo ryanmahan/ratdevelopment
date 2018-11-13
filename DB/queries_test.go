@@ -30,7 +30,7 @@ func BenchmarkGetLatestSnapshotsByTenant(b *testing.B) {
 }
 
 func BenchmarkGetValidTimestamps(b *testing.B) {
-	session, err := NewDBSession()
+	session, err := NewDBSession(host)
 	if err != nil {
 		b.Error(err)
 		return
@@ -44,7 +44,7 @@ func BenchmarkGetValidTimestamps(b *testing.B) {
 }
 
 func BenchmarkGetTimedSnapshot(b *testing.B) {
-	session, err := NewDBSession()
+	session, err := NewDBSession(host)
 	if err != nil {
 		b.Error(err)
 		return
