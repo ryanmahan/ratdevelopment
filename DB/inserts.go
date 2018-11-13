@@ -17,13 +17,13 @@ func (db *DatabaseSession) InsertSnapshot(jsonBytes []byte) (error){
 	if err != nil { return err }
 
 	// Functions per table
-	db.insertLastestByTenant(&values, &jsonBytes)
+	db.insertLatestByTenant(&values, &jsonBytes)
 	db.insertSnapshotsBySerialNumber(&values, &jsonBytes)
 	return nil
 }
 
 // Updates the latest_snapshot_by_tenant table with the info from a single json file
-func (db *DatabaseSession) insertLastestByTenant(info *map[string]interface{}, jsonBlob *[]byte) (error) {
+func (db *DatabaseSession) insertLatestByTenant(info *map[string]interface{}, jsonBlob *[]byte) (error) {
 
 	serialNum := (*info)["serialNumberInserv"]
 
