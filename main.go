@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 	"os"
@@ -46,7 +47,18 @@ func main() {
 	}
 	defer session.Close()
 	env := &Env{session: session}
-	//http.Handle("/", http.FileServer(http.Dir("./dist")))
-	http.HandleFunc("/GetLatestSnapshotsByTenant", env.handleGetLatestSnapshotsByTenant)
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	mux := http.NewServeMux()
+	//mux.Handle("/", http.FileServer(http.Dir("./dist")))
+	mux.HandleFunc("/GetLatestSnapshotsByTenant", env.handleGetLatestSnapshotsByTenant)
+
+	handler := cors.Default().Handler(mux)
+
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost", "http://localhost:8080", "http://localhost:8081"},
+		AllowCredentials: true,
+		Debug:            true,
+	})
+	handler = c.Handler(handler)
+
+	log.Fatal(http.ListenAndServe(":8081", handler))
 }
