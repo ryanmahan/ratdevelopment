@@ -7,10 +7,8 @@ import (
 //FileBrowserDBSession is an interface for querying the database session
 type FileBrowserDBSession interface {
 	GetLatestSnapshotsByTenant(string) ([]string, error)
-	GetTimedSystemSnapshotByTenant(string, string, int) (string, error)
+	GetTimedSnapshotByTenant(string, string, int) (string, error)
 	GetValidTimestampsOfSystem(string, int) ([]time.Time, error)
-	TimestampsToStrings([]time.Time) []string
-	StringToTimestamp(string) (time.Time, error)
 }
 
 //GetLatestSnapshotsByTenant returns slice of JSON blobs for the latest snapshots of all systems owned by a tenant
@@ -19,8 +17,8 @@ func (db *DatabaseSession) GetLatestSnapshotsByTenant(tenant string) ([]string, 
 }
 
 //GetTimedSystemSnapshotByTenant gets the JSON blob of a system at a specified timestamp
-func (db *DatabaseSession) GetTimedSystemSnapshotByTenant(tenant, time string, sernum int) (string, error) {
-	stamp, err := db.StringToTimestamp(time)
+func (db *DatabaseSession) GetTimedSnapshotByTenant(tenant, time string, sernum int) (string, error) {
+	stamp, err := StringToTimestamp(time)
 	if err != nil {
 		return "", err
 	}
@@ -34,7 +32,7 @@ func (db *DatabaseSession) GetTimedSystemSnapshotByTenant(tenant, time string, s
 const timeFormat string = time.RFC1123
 
 //TimestampsToStrings converts a time slice to string slice for convenience
-func (db *DatabaseSession) TimestampsToStrings(times []time.Time) []string {
+func TimestampsToStrings(times []time.Time) []string {
 	timestamps := make([]string, len(times))
 	for i, stamp := range times {
 		timestamps[i] = stamp.Format(timeFormat)
@@ -43,8 +41,22 @@ func (db *DatabaseSession) TimestampsToStrings(times []time.Time) []string {
 }
 
 //StringToTimestamp parses a timestamp to a time object for use in queries
-func (db *DatabaseSession) StringToTimestamp(stamp string) (time.Time, error) {
+func StringToTimestamp(stamp string) (time.Time, error) {
 	return time.Parse(timeFormat, stamp)
+}
+
+//MakeSingleStringSlice is a util function to package a string in a slice quickly
+func MakeSingleStringSlice(item string) []string {
+	output := make([]string, 1)
+	output[0] = item
+	return output
+}
+
+//MakeSingleTimeSlice is a util function to package a time.Tim in a slice quickly
+func MakeSingleTimeSlice(item time.Time) []time.Time {
+	output := make([]time.Time, 1)
+	output[0] = item
+	return output
 }
 
 //GetValidTimestampsOfSystem returns a slice of strings that represent valid timestamps to index by for a system

@@ -52,7 +52,7 @@ func BenchmarkGetTimedSnapshot(b *testing.B) {
 		b.Error(err)
 		return
 	}
-	_, err = session.GetTimedSystemSnapshotByTenant("hpe", stamps[0], 9996788)
+	_, err = session.GetTimedSnapshotByTenant("hpe", stamps[0], 9996788)
 	if err != nil {
 		b.Error(err)
 		return
