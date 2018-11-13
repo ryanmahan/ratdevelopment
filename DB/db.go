@@ -1,21 +1,22 @@
 package DB
 
 import (
-	"github.com/gocql/gocql"
-	"log"
-	"strings"
 	"time"
+
+	"github.com/gocql/gocql"
 )
 
+//DatabaseSession is a container for existing cassandra session
 type DatabaseSession struct {
 	*gocql.Session
 }
 
 func NewDBSession(hosts ...string) (*DatabaseSession, error) {
-	log.Printf("Cassandra IPs: %s", strings.Join(hosts, ", "))
+	//log.Printf("Cassandra IPs: %s", strings.Join(hosts, ", "))
 	db := gocql.NewCluster(hosts...)
 	db.ProtoVersion = 4
-	db.Timeout = time.Minute * 2
+	db.ConnectTimeout = 30 * time.Second //timeout to connect to the cassandra instance
+	db.Timeout = 30 * time.Second        //timeout for queries
 	db.Keyspace = "defaultks"
 	session, err := db.CreateSession()
 	if err != nil {

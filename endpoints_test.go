@@ -3,13 +3,19 @@ package main
 import (
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
+	"time"
 )
 
 type mockSession struct{}
 
 const expectedObtainedString = "\n...expected = %#v\n...obtained = %#v"
+
+func (db *mockSession) GetSystemsOfTenant(tenant string) ([]string, error) {
+	return []string{"9996788"}, nil
+}
 
 func (db *mockSession) GetLatestSnapshotsByTenant(tenant string) ([]string, error) {
 
@@ -25,18 +31,48 @@ func (db *mockSession) GetLatestSnapshotsByTenant(tenant string) ([]string, erro
 	return snapshots, nil
 }
 
+func (db *mockSession) GetTimedSnapshotByTenant(tenant string, time string, sysID int) (string, error) {
+	snapshot := "{ SerialNumberInserv: \"%SYSID%\", tenant: { authorized:[\"%TENANT%\"]}"
+	snapshot = strings.Replace(snapshot, "%TENANT%", tenant, 1)
+	snapshot = strings.Replace(snapshot, "%SYSID%", strconv.Itoa(sysID), 1)
+	return snapshot, nil
+}
+
+func (db *mockSession) GetValidTimestampsOfSystem(tenant string, sysID int) ([]time.Time, error) {
+	return []time.Time{time.Now()}, nil
+}
+
+func TestGetSerialNumbersOfTenant(t *testing.T) {
+	rec := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/GetTenantSystems?tenant=hpe", nil)
+	env := Env{session: &mockSession{}}
+	env.MakeTenantSystemsHandler().ServeHTTP(rec, req)
+
+	if http.StatusOK != rec.Code {
+		t.Errorf(expectedObtainedString, http.StatusOK, rec.Code)
+	}
+
+	if rec.Header().Get("Content-Type") != "text/plain" {
+		t.Errorf(expectedObtainedString, "text/plain", rec.Header().Get("Content-Type"))
+	}
+
+	expected := "[9996788]"
+	if expected != rec.Body.String() {
+		t.Errorf(expectedObtainedString, expected, rec.Body.String())
+	}
+}
+
 func TestHandleGetLatestSnapshotsByTenantWithoutTenant(t *testing.T) {
 	rec := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/GetLatestSnapshotsByTenant", nil)
-
 	env := Env{session: &mockSession{}}
-	http.HandlerFunc(env.handleGetLatestSnapshotsByTenant).ServeHTTP(rec, req)
+	env.MakeLatestSnapshotsHandler().ServeHTTP(rec, req)
 
 	if http.StatusBadRequest != rec.Code {
 		t.Errorf(expectedObtainedString, http.StatusBadRequest, rec.Code)
 	}
 
-	expected := "Malformed query string: tenant must have a value"
+	expected := "Malformed query string: not enough arguments provided"
 	if expected != rec.Body.String() {
 		t.Errorf(expectedObtainedString, expected, rec.Body.String())
 	}
@@ -47,7 +83,7 @@ func TestHandleGetLatestSnapshotsByTenantWithTextTenant(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/GetLatestSnapshotsByTenant?tenant=hpe", nil)
 
 	env := Env{session: &mockSession{}}
-	http.HandlerFunc(env.handleGetLatestSnapshotsByTenant).ServeHTTP(rec, req)
+	env.MakeLatestSnapshotsHandler().ServeHTTP(rec, req)
 
 	if http.StatusOK != rec.Code {
 		t.Errorf(expectedObtainedString, http.StatusOK, rec.Code)
@@ -71,7 +107,7 @@ func TestHandleGetLatestSnapshotsByTenantWithTenantID(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/GetLatestSnapshotsByTenant?tenant=264593856", nil)
 
 	env := Env{session: &mockSession{}}
-	http.HandlerFunc(env.handleGetLatestSnapshotsByTenant).ServeHTTP(rec, req)
+	env.MakeLatestSnapshotsHandler().ServeHTTP(rec, req)
 
 	if http.StatusOK != rec.Code {
 		t.Errorf(expectedObtainedString, http.StatusOK, rec.Code)
