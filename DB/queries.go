@@ -9,6 +9,7 @@ type FileBrowserDBSession interface {
 	GetLatestSnapshotsByTenant(string) ([]string, error)
 	GetTimedSnapshotByTenant(string, string, int) (string, error)
 	GetValidTimestampsOfSystem(string, int) ([]time.Time, error)
+	GetSystemsOfTenant(string) ([]string, error)
 }
 
 //GetLatestSnapshotsByTenant returns slice of JSON blobs for the latest snapshots of all systems owned by a tenant
@@ -16,13 +17,19 @@ func (db *DatabaseSession) GetLatestSnapshotsByTenant(tenant string) ([]string, 
 	return db.RunQuery("SELECT snapshot FROM latest_snapshots_by_tenant WHERE tenant = ?", tenant)
 }
 
-//GetTimedSystemSnapshotByTenant gets the JSON blob of a system at a specified timestamp
-func (db *DatabaseSession) GetTimedSnapshotByTenant(tenant, time string, sernum int) (string, error) {
+//GetSystemsOfTenant returns a list of serial numbers a given tenant has access to
+func (db *DatabaseSession) GetSystemsOfTenant(tenant string) ([]string, error) {
+	return db.RunQuery("SELECT serial_number FROM defaultks.latest_snapshots_by_tenant WHERE tenant = ?", tenant)
+
+}
+
+//GetTimedSnapshotByTenant gets the JSON blob of a system at a specified timestamp
+func (db *DatabaseSession) GetTimedSnapshotByTenant(tenant, time string, serialNumber int) (string, error) {
 	stamp, err := StringToTimestamp(time)
 	if err != nil {
 		return "", err
 	}
-	snapshots, err := db.RunQuery("SELECT snapshot FROM snapshots_by_serial_number WHERE tenant = ? AND serial_number = ? AND time = ?", tenant, sernum, stamp)
+	snapshots, err := db.RunQuery("SELECT snapshot FROM snapshots_by_serial_number WHERE tenant = ? AND serial_number = ? AND time = ?", tenant, serialNumber, stamp)
 	if err != nil {
 		return "", err
 	}
@@ -46,18 +53,18 @@ func StringToTimestamp(stamp string) (time.Time, error) {
 }
 
 //GetValidTimestampsOfSystem returns a slice of strings that represent valid timestamps to index by for a system
-func (db *DatabaseSession) GetValidTimestampsOfSystem(tenant string, sernum int) ([]time.Time, error) {
-	iter := db.Session.Query("SELECT time FROM snapshots_by_serial_number WHERE tenant = ? AND serial_number = ?", tenant, sernum).Iter()
-	items := make([]time.Time, iter.NumRows())
-	for i := 0; i < len(items); i++ {
+func (db *DatabaseSession) GetValidTimestampsOfSystem(tenant string, serialNumber int) ([]time.Time, error) {
+	iter := db.Session.Query("SELECT time FROM snapshots_by_serial_number WHERE tenant = ? AND serial_number = ?", tenant, serialNumber).Iter()
+	stamps := make([]time.Time, iter.NumRows())
+	for i := 0; i < len(stamps); i++ {
 		var stamp time.Time
 		iter.Scan(&stamp)
-		items[i] = stamp
+		stamps[i] = stamp
 	}
 	if err := iter.Close(); err != nil {
 		return nil, err
 	}
-	return items, nil
+	return stamps, nil
 }
 
 //RunQuery is a helper function to easily get slice of strings that is returned from query, with error handling

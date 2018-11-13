@@ -12,6 +12,30 @@ func init() {
 
 var host string
 
+func BenchmarkTenantSerialNumbers(b *testing.B) {
+	session, err := NewDBSession(host)
+	if err != nil {
+		b.Error(err)
+		return
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		serialNums, err := session.GetSystemsOfTenant("hpe")
+		if err != nil {
+			b.Error(err)
+			return
+		}
+		if len(serialNums) == 0 {
+			b.Error("Expected serialNums to be populated but was empty")
+			return
+		}
+		if serialNums[0] != "9996788" {
+			b.Error("expecting serial number 9996788, got ", serialNums[0])
+			return
+		}
+	}
+}
+
 func BenchmarkGetLatestSnapshotsByTenant(b *testing.B) {
 	session, err := NewDBSession(host)
 	if err != nil {
@@ -26,7 +50,6 @@ func BenchmarkGetLatestSnapshotsByTenant(b *testing.B) {
 			return
 		}
 	}
-
 }
 
 func BenchmarkGetValidTimestamps(b *testing.B) {

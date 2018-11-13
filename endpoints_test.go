@@ -13,6 +13,10 @@ type mockSession struct{}
 
 const expectedObtainedString = "\n...expected = %#v\n...obtained = %#v"
 
+func (db *mockSession) GetSystemsOfTenant(tenant string) ([]string, error) {
+	return []string{"9996788"}, nil
+}
+
 func (db *mockSession) GetLatestSnapshotsByTenant(tenant string) ([]string, error) {
 
 	snapshots := []string{
@@ -36,6 +40,26 @@ func (db *mockSession) GetTimedSnapshotByTenant(tenant string, time string, sysI
 
 func (db *mockSession) GetValidTimestampsOfSystem(tenant string, sysID int) ([]time.Time, error) {
 	return []time.Time{time.Now()}, nil
+}
+
+func TestGetSerialNumbersOfTenant(t *testing.T) {
+	rec := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/GetTenantSystems?tenant=hpe", nil)
+	env := Env{session: &mockSession{}}
+	env.MakeTenantSystemsHandler().ServeHTTP(rec, req)
+
+	if http.StatusOK != rec.Code {
+		t.Errorf(expectedObtainedString, http.StatusOK, rec.Code)
+	}
+
+	if rec.Header().Get("Content-Type") != "text/plain" {
+		t.Errorf(expectedObtainedString, "text/plain", rec.Header().Get("Content-Type"))
+	}
+
+	expected := "[9996788]"
+	if expected != rec.Body.String() {
+		t.Errorf(expectedObtainedString, expected, rec.Body.String())
+	}
 }
 
 func TestHandleGetLatestSnapshotsByTenantWithoutTenant(t *testing.T) {

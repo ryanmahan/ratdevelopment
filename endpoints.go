@@ -115,6 +115,10 @@ func (env *Env) translateGetValidTimestampsOfSystem(props []interface{}) ([]stri
 	return timeStrings, err
 }
 
+func (env *Env) translateGetSystemsOfTenant(props []interface{}) ([]string, error) {
+	return env.session.GetSystemsOfTenant(props[0].(string))
+}
+
 //---------------------------------------------FOR CONCISION-------------------------------------------------
 //MakeLatestSnapshotsHandler is the top-level concision to make the handler for GetLatestSnapshotsByTenant
 func (env *Env) MakeLatestSnapshotsHandler() http.HandlerFunc {
@@ -129,4 +133,8 @@ func (env *Env) MakeTimedSnapshotHandler() http.HandlerFunc {
 //MakeTimestampHandler is the top-level concision to make the handler for GetValidTimestampsOfSystem
 func (env *Env) MakeTimestampHandler() http.HandlerFunc {
 	return env.MakeHandler(env.translateGetValidTimestampsOfSystem, "text/plain", env.DrawDirect, "tenant", "sernum")
+}
+
+func (env *Env) MakeTenantSystemsHandler() http.HandlerFunc {
+	return env.MakeHandler(env.translateGetSystemsOfTenant, "text/plain", env.DrawDirect, "tenant")
 }

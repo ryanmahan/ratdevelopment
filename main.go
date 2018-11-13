@@ -50,5 +50,6 @@ func main() {
 	http.HandleFunc("/GetLatestSnapshotsByTenant", env.MakeLatestSnapshotsHandler())
 	http.HandleFunc("/GetTimedSnapshotByTenant", env.MakeTimedSnapshotHandler())
 	http.HandleFunc("/GetValidTimestamps", env.MakeTimestampHandler())
+	http.HandleFunc("/GetTenantSystems", env.MakeTenantSystemsHandler())
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
