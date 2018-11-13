@@ -7,13 +7,10 @@ type FileBrowserDBSession interface {
 func (db *DatabaseSession) GetLatestSnapshotsByTenant(tenant string) ([]string, error) {
 
 	iter := db.Session.Query("SELECT snapshot FROM latest_snapshots_by_tenant WHERE tenant = ?", tenant).Iter()
-
-	snapshots := make([]string, iter.NumRows())
+	snapshots := make([]string, 0)
 	var jsonBlob string
-	i := 0
 	for iter.Scan(&jsonBlob) {
-		snapshots[i] = jsonBlob
-		i++
+		snapshots = append(snapshots, jsonBlob)
 	}
 	if err := iter.Close(); err != nil {
 		return nil, err
