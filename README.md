@@ -38,6 +38,11 @@ To get your database set up for the first time, run
 ```
 which will run the cql in schema.cql on your local cassandra database.
 
+Run this script, passing in the directory containing the data dump, to load the data dump into cassandra
+```bash
+./scripts/upload.sh <directory_containing_data_dumps>
+```
+
 ### Manual schema setup
 
 First your going to have to create is a keyspace
@@ -74,23 +79,14 @@ DELETE FROM table_name WHERE (some relations);
 Refer to http://cassandra.apache.org/doc/latest/cql/dml.html to go more in depth into CQL
 
 
-For my quick demo to work, you need to run:
-```
-CREATE KEYSPACE IF NOT EXISTS test_space 
-    WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
-CREATE TABLE IF NOT EXISTS test_space.comments (
-    comment varchar,
-    name varchar,
-    datetime timestamp,
-    PRIMARY KEY ((name), datetime)
-    ) WITH CLUSTERING ORDER BY (datetime DESC);
-```
-
-### Potnetially useful tidbits
+### Potentially useful tidbits
 
 Use the following from within cqlsh to see all of your clusters...
 ```
 SELECT cluster_name, listen_address FROM system.local;
 ```
 
-TODO: could be a good idea to maintain the schema using scripts of some kind... (i think i remember seeing a gocql addon project that maintained the schema, need to look into it)
+To clear all data from a table, use:
+```
+TRUNCATE TABLE keyspace.table_name;
+```
