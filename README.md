@@ -90,9 +90,10 @@ but if it isn't then be sure to `vagrant ssh` into the virtual machine and run
 ```
 which will run the cql in schema.cql on your local cassandra database.
 
-Run this script, passing in the directory containing the data dump, to load the data dump into cassandra
-```bash
-./scripts/upload.sh <directory_containing_data_dumps>
+Build and run this, on your host computer, passing in the directory containing the data dump, to load the data dump into cassandra.
+```
+go build .\scripts\mouse_upload
+mouse_upload.exe <directory_containing_data_dumps>
 ```
 
 ### Manual schema setup
