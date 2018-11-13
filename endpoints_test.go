@@ -3,7 +3,6 @@ package main
 import (
 	"net/http"
 	"net/http/httptest"
-	"ratdevelopment-backend/DB"
 	"strconv"
 	"strings"
 	"testing"
@@ -36,7 +35,7 @@ func (db *mockSession) GetTimedSnapshotByTenant(tenant string, time string, sysI
 }
 
 func (db *mockSession) GetValidTimestampsOfSystem(tenant string, sysID int) ([]time.Time, error) {
-	return DB.MakeSingleTimeSlice(time.Now()), nil
+	return []time.Time{time.Now()}, nil
 }
 
 func TestHandleGetLatestSnapshotsByTenantWithoutTenant(t *testing.T) {

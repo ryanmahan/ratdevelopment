@@ -16,6 +16,7 @@ func NewDBSession(hosts ...string) (*DatabaseSession, error) {
 	db := gocql.NewCluster(hosts...)
 	db.ProtoVersion = 4
 	db.ConnectTimeout = 30 * time.Second
+	db.Timeout = 30 * time.Second
 	db.Keyspace = "defaultks"
 	session, err := db.CreateSession()
 	if err != nil {
