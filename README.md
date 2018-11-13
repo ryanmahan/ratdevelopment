@@ -83,12 +83,18 @@ cqlsh 10.10.10.31
 ```
 
 ### Automatic schema setup
-This script should be run by `vagrant up`, 
+This script should be run by `vagrant up`,
 but if it isn't then be sure to `vagrant ssh` into the virtual machine and run
 ```
 /vagrant/scripts/migrate.sh 10.10.10.31
 ```
 which will run the cql in schema.cql on your local cassandra database.
+
+Build and run this, on your host computer, passing in the directory containing the data dump, to load the data dump into cassandra.
+```
+go build .\scripts\mouse_upload
+mouse_upload.exe <directory_containing_data_dumps>
+```
 
 ### Manual schema setup
 This section is left for posterity
@@ -131,4 +137,9 @@ Refer to http://cassandra.apache.org/doc/latest/cql/dml.html to go more in depth
 Use the following from within `cqlsh` to see all of your clusters...
 ```
 SELECT cluster_name, listen_address FROM system.local;
+```
+
+To clear all data from a table, use:
+```
+TRUNCATE TABLE keyspace.table_name;
 ```
