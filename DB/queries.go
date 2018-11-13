@@ -45,20 +45,6 @@ func StringToTimestamp(stamp string) (time.Time, error) {
 	return time.Parse(timeFormat, stamp)
 }
 
-//MakeSingleStringSlice is a util function to package a string in a slice quickly
-func MakeSingleStringSlice(item string) []string {
-	output := make([]string, 1)
-	output[0] = item
-	return output
-}
-
-//MakeSingleTimeSlice is a util function to package a time.Tim in a slice quickly
-func MakeSingleTimeSlice(item time.Time) []time.Time {
-	output := make([]time.Time, 1)
-	output[0] = item
-	return output
-}
-
 //GetValidTimestampsOfSystem returns a slice of strings that represent valid timestamps to index by for a system
 func (db *DatabaseSession) GetValidTimestampsOfSystem(tenant string, sernum int) ([]time.Time, error) {
 	iter := db.Session.Query("SELECT time FROM snapshots_by_serial_number WHERE tenant = ? AND serial_number = ?", tenant, sernum).Iter()

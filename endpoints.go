@@ -103,7 +103,7 @@ func (env *Env) translateGetLatestSnapshotsByTenant(props []interface{}) ([]stri
 func (env *Env) translateGetTimedSnapshotByTenant(props []interface{}) ([]string, error) {
 	snapshot, error := env.session.GetTimedSnapshotByTenant(props[0].(string), props[1].(string), props[2].(int))
 	if error == nil {
-		return DB.MakeSingleStringSlice(snapshot), error
+		return []string{snapshot}, error
 	}
 	return nil, error
 }
