@@ -9,6 +9,8 @@ type FileBrowserDBSession interface {
 	GetLatestSnapshotsByTenant(string) ([]string, error)
 	GetTimedSystemSnapshotByTenant(string, string, int) (string, error)
 	GetValidTimestampsOfSystem(string, int) ([]time.Time, error)
+	TimestampsToStrings([]time.Time) []string
+	StringToTimestamp(string) (time.Time, error)
 }
 
 //GetLatestSnapshotsByTenant returns slice of JSON blobs for the latest snapshots of all systems owned by a tenant
@@ -18,7 +20,7 @@ func (db *DatabaseSession) GetLatestSnapshotsByTenant(tenant string) ([]string, 
 
 //GetTimedSystemSnapshotByTenant gets the JSON blob of a system at a specified timestamp
 func (db *DatabaseSession) GetTimedSystemSnapshotByTenant(tenant, time string, sernum int) (string, error) {
-	stamp, err := StringToTimestamp(time)
+	stamp, err := db.StringToTimestamp(time)
 	if err != nil {
 		return "", err
 	}
@@ -32,7 +34,7 @@ func (db *DatabaseSession) GetTimedSystemSnapshotByTenant(tenant, time string, s
 const timeFormat string = time.RFC1123
 
 //TimestampsToStrings converts a time slice to string slice for convenience
-func TimestampsToStrings(times []time.Time) []string {
+func (db *DatabaseSession) TimestampsToStrings(times []time.Time) []string {
 	timestamps := make([]string, len(times))
 	for i, stamp := range times {
 		timestamps[i] = stamp.Format(timeFormat)
@@ -41,7 +43,7 @@ func TimestampsToStrings(times []time.Time) []string {
 }
 
 //StringToTimestamp parses a timestamp to a time object for use in queries
-func StringToTimestamp(stamp string) (time.Time, error) {
+func (db *DatabaseSession) StringToTimestamp(stamp string) (time.Time, error) {
 	return time.Parse(timeFormat, stamp)
 }
 
