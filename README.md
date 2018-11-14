@@ -143,3 +143,15 @@ To clear all data from a table, use:
 ```
 TRUNCATE TABLE keyspace.table_name;
 ```
+
+### HTTP Request Usage
+| HTTP Request | Inputs | Outputs |
+|:--------------|:--------:|---------:|
+| `/GetLatestSnapshotsByTenant` | tenant | Comma Delimited JSON |
+| `/GetTimedSnapshotByTenant` | tenant, time (RFC1123), serNum | Single JSON |
+| `/GetValidTimestamps` | tenant, serNum | Plain-text array of RFC1123 timestamps |
+| `/GetTenantSystems` | tenant | Plain-text array of serial number strings |
+
+a properly formatted HTTP request will look like `/GetValidTimestamps?tenant=hpe?serNum=9996788`
+
+The output of `/GetValidTimestamps` should be used to populate the `time` field for `/GetTimedSnapshotByTenant`
