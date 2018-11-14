@@ -55,11 +55,10 @@ func StringToTimestamp(stamp string) (time.Time, error) {
 //GetValidTimestampsOfSystem returns a slice of strings that represent valid timestamps to index by for a system
 func (db *DatabaseSession) GetValidTimestampsOfSystem(tenant string, serialNumber int) ([]time.Time, error) {
 	iter := db.Session.Query("SELECT time FROM snapshots_by_serial_number WHERE tenant = ? AND serial_number = ?", tenant, serialNumber).Iter()
-	stamps := make([]time.Time, iter.NumRows())
-	for i := 0; i < len(stamps); i++ {
-		var stamp time.Time
-		iter.Scan(&stamp)
-		stamps[i] = stamp
+	stamps := make([]time.Time, 0, iter.NumRows())
+	var stamp time.Time
+	for iter.Scan(&stamp) {
+		stamps = append(stamps, stamp)
 	}
 	if err := iter.Close(); err != nil {
 		return nil, err
@@ -70,11 +69,12 @@ func (db *DatabaseSession) GetValidTimestampsOfSystem(tenant string, serialNumbe
 //RunQuery is a helper function to easily get slice of strings that is returned from query, with error handling
 func (db *DatabaseSession) RunQuery(query string, args ...interface{}) ([]string, error) {
 	iter := db.Session.Query(query, args...).Iter()
-	items := make([]string, iter.NumRows())
-	for i, item := range items {
-		iter.Scan(&item)
-		items[i] = item
+	items := make([]string, 0, iter.NumRows())
+	var item string
+	for iter.Scan(&item) {
+		items = append(items, item)
 	}
+	//	This checks for errors upon closing the iterator
 	if err := iter.Close(); err != nil {
 		return nil, err
 	}
