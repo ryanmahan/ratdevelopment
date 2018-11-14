@@ -47,6 +47,9 @@ func main() {
 	defer session.Close()
 	env := &Env{session: session}
 	//http.Handle("/", http.FileServer(http.Dir("./dist")))
-	http.HandleFunc("/GetLatestSnapshotsByTenant", env.handleGetLatestSnapshotsByTenant)
+	http.HandleFunc("/GetLatestSnapshotsByTenant", env.MakeLatestSnapshotsHandler())
+	http.HandleFunc("/GetTimedSnapshotByTenant", env.MakeTimedSnapshotHandler())
+	http.HandleFunc("/GetValidTimestamps", env.MakeTimestampHandler())
+	http.HandleFunc("/GetTenantSystems", env.MakeTenantSystemsHandler())
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }

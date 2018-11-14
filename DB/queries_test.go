@@ -12,15 +12,76 @@ func init() {
 
 var host string
 
-func BenchmarkGetLatestSnapshotsByTenant(b *testing.B) {
+func TestTenantSerialNumbers(t *testing.T) {
 	session, err := NewDBSession(host)
 	if err != nil {
-		b.Error(err)
+		t.Error(err)
 		return
 	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		session.GetLatestSnapshotsByTenant("hpe")
+
+	serialNums, err := session.GetSystemsOfTenant("hpe")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if len(serialNums) == 0 {
+		t.Error("Expected serialNums to be populated but was empty")
+		return
+	}
+	if serialNums[0] != "9996788" {
+		t.Error("expecting serial number 9996788, got ", serialNums[0])
+		return
+	}
+}
+
+func TestGetLatestSnapshotsByTenant(t *testing.T) {
+	session, err := NewDBSession(host)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_, err = session.GetLatestSnapshotsByTenant("hpe")
+	if err != nil {
+		t.Error(err)
+		return
 	}
 
+}
+
+func TestGetValidTimestamps(t *testing.T) {
+	session, err := NewDBSession(host)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	_, err = session.GetValidTimestampsOfSystem("hpe", 9996788)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+}
+
+func TestGetTimedSnapshot(t *testing.T) {
+	session, err := NewDBSession(host)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	timestamps, err := session.GetValidTimestampsOfSystem("hpe", 9996788)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	stamps := TimestampsToStrings(timestamps)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_, err = session.GetTimedSnapshotByTenant("hpe", stamps[0], 9996788)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 }
