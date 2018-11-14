@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"ratdevelopment-backend/DB"
+	"strconv"
 	"strings"
 )
 
@@ -27,7 +28,7 @@ func (env *Env) MakeHandler(query func([]interface{}) ([]string, error), content
 			properties[i] = q.Get(name)
 		}
 
-		popErr, index := CheckPopulation(w, properties...)
+		popErr, index := CheckPopulation(properties...)
 		if popErr {
 			w.WriteHeader(http.StatusBadRequest)
 			if index == -1 {
@@ -50,7 +51,7 @@ func (env *Env) MakeHandler(query func([]interface{}) ([]string, error), content
 }
 
 //CheckPopulation ensures that properties queried in URL have been properly populated, and also returns the index of the unpopulated field
-func CheckPopulation(w http.ResponseWriter, vals ...interface{}) (bool, int) {
+func CheckPopulation(vals ...interface{}) (bool, int) {
 	if len(vals) == 0 || forAll(vals, func(s string) bool { return len(s) == 0 }) {
 		return true, -1
 	}
@@ -101,16 +102,24 @@ func (env *Env) translateGetLatestSnapshotsByTenant(props []interface{}) ([]stri
 
 //translateGetTimedSnapshotByTenant is a translator for makeHandler of GetLatestSnapshotsByTenant
 func (env *Env) translateGetTimedSnapshotByTenant(props []interface{}) ([]string, error) {
-	snapshot, error := env.session.GetTimedSnapshotByTenant(props[0].(string), props[1].(string), props[2].(int))
-	if error == nil {
-		return []string{snapshot}, error
+	serialNumber, err := strconv.Atoi(props[2].(string))
+	if err != nil {
+		return nil, err
 	}
-	return nil, error
+	snapshot, err := env.session.GetTimedSnapshotByTenant(props[0].(string), props[1].(string), serialNumber)
+	if err == nil {
+		return []string{snapshot}, err
+	}
+	return nil, err
 }
 
 //translateGetValidTimestampsOfSystem is a translator for makeHandler of GetValidTimestampsOfSystem
 func (env *Env) translateGetValidTimestampsOfSystem(props []interface{}) ([]string, error) {
-	times, err := env.session.GetValidTimestampsOfSystem(props[0].(string), props[1].(int))
+	serialNumber, err := strconv.Atoi(props[1].(string))
+	if err != nil {
+		return nil, err
+	}
+	times, err := env.session.GetValidTimestampsOfSystem(props[0].(string), serialNumber)
 	timeStrings := DB.TimestampsToStrings(times)
 	return timeStrings, err
 }
@@ -132,7 +141,7 @@ func (env *Env) MakeTimedSnapshotHandler() http.HandlerFunc {
 
 //MakeTimestampHandler is the top-level concision to make the handler for GetValidTimestampsOfSystem
 func (env *Env) MakeTimestampHandler() http.HandlerFunc {
-	return env.MakeHandler(env.translateGetValidTimestampsOfSystem, "text/plain", env.DrawDirect, "tenant", "sernum")
+	return env.MakeHandler(env.translateGetValidTimestampsOfSystem, "application/json", env.DrawMultipleJSON, "tenant", "sernum")
 }
 
 func (env *Env) MakeTenantSystemsHandler() http.HandlerFunc {

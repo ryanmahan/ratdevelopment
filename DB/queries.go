@@ -42,7 +42,7 @@ const timeFormat string = time.RFC1123
 func TimestampsToStrings(times []time.Time) []string {
 	timestamps := make([]string, len(times))
 	for i, stamp := range times {
-		timestamps[i] = stamp.Format(timeFormat)
+		timestamps[i] = "\"" + stamp.Format(timeFormat) + "\""
 	}
 	return timestamps
 }
