@@ -49,8 +49,10 @@ func main() {
 	env := &Env{session: session}
 	mux := http.NewServeMux()
 	//mux.Handle("/", http.FileServer(http.Dir("./dist")))
-	mux.HandleFunc("/GetLatestSnapshotsByTenant", env.handleGetLatestSnapshotsByTenant)
-
+	mux.HandleFunc("/GetLatestSnapshotsByTenant", env.MakeLatestSnapshotsHandler())
+	mux.HandleFunc("/GetTimedSnapshotByTenant", env.MakeTimedSnapshotHandler())
+	mux.HandleFunc("/GetValidTimestamps", env.MakeTimestampHandler())
+	mux.HandleFunc("/GetTenantSystems", env.MakeTenantSystemsHandler())
 	handler := cors.Default().Handler(mux)
 
 	c := cors.New(cors.Options{
