@@ -56,9 +56,9 @@ func StringToTimestamp(stamp string) (time.Time, error) {
 func (db *DatabaseSession) GetValidTimestampsOfSystem(tenant string, serialNumber int) ([]time.Time, error) {
 	iter := db.Session.Query("SELECT time FROM snapshots_by_serial_number WHERE tenant = ? AND serial_number = ?", tenant, serialNumber).Iter()
 	stamps := make([]time.Time, 0, iter.NumRows())
-  var stamp time.Time
+	var stamp time.Time
 	for iter.Scan(&stamp) {
-    stamps = append(stamps, stamp)
+		stamps = append(stamps, stamp)
 	}
 	if err := iter.Close(); err != nil {
 		return nil, err
@@ -70,9 +70,9 @@ func (db *DatabaseSession) GetValidTimestampsOfSystem(tenant string, serialNumbe
 func (db *DatabaseSession) RunQuery(query string, args ...interface{}) ([]string, error) {
 	iter := db.Session.Query(query, args...).Iter()
 	items := make([]string, 0, iter.NumRows())
-  var item string
+	var item string
 	for iter.Scan(&item) {
-    items = append(items, item)
+		items = append(items, item)
 	}
 	//	This checks for errors upon closing the iterator
 	if err := iter.Close(); err != nil {
