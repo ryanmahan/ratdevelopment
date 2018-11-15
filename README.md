@@ -148,10 +148,10 @@ TRUNCATE TABLE keyspace.table_name;
 | HTTP Request | Inputs | Outputs |
 |:--------------|:--------:|---------:|
 | `/GetLatestSnapshotsByTenant` | tenant | Comma Delimited JSON |
-| `/GetTimedSnapshotByTenant` | tenant, time (RFC1123), serNum | Single JSON |
-| `/GetValidTimestamps` | tenant, serNum | Plain-text array of RFC1123 timestamps |
+| `/GetSnapshotByTenantSerialNumberAndDate` | tenant, time (RFC1123), serNum | Single JSON |
+| `/GetValidTimestampsForSerialNumber` | tenant, serialNumber | Plain-text array of RFC1123 timestamps |
 | `/GetTenantSystems` | tenant | Plain-text array of serial number strings |
 
-a properly formatted HTTP request will look like `/GetValidTimestamps?tenant=hpe?serNum=9996788`
+a properly formatted HTTP request will look like `/GetValidTimestampsForSerialNumber?tenant=hpe?serNum=9996788`
 
-The output of `/GetValidTimestamps` should be used to populate the `time` field for `/GetTimedSnapshotByTenant`
+The output of `/GetValidTimestampsForSerialNumber` should be used to populate the `time` field for `/GetSnapshotByTenantSerialNumberAndDate`
