@@ -48,13 +48,13 @@ func main() {
 	defer session.Close()
 	env := &Env{session: session}
 	mux := http.NewServeMux()
-	//mux.Handle("/", http.FileServer(http.Dir("./dist")))
-	mux.HandleFunc("/GetLatestSnapshotsByTenant", env.MakeLatestSnapshotsHandler())
-	mux.HandleFunc("/GetTimedSnapshotByTenant", env.MakeTimedSnapshotHandler())
-	mux.HandleFunc("/GetValidTimestamps", env.MakeTimestampHandler())
-	mux.HandleFunc("/GetTenantSystems", env.MakeTenantSystemsHandler())
-	handler := cors.Default().Handler(mux)
 
+	mux.HandleFunc("/GetLatestSnapshotsByTenant", env.handleGetLatestSnapshotByTenant)
+	mux.HandleFunc("/GetSnapshotByTenantSerialNumberAndDate", env.handleGetSnapshotByTenantSerialNumberAndDate)
+	mux.HandleFunc("/GetValidTimestampsForSerialNumber", env.handleGetValidTimestampsForSerialNumber)
+	mux.HandleFunc("/GetTenantSystems", env.handleGetTenantSystems)
+
+	handler := cors.Default().Handler(mux)
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost", "http://localhost:8080", "http://localhost:8081"},
 		AllowCredentials: true,
