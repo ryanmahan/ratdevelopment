@@ -55,7 +55,7 @@ func TestGetValidTimestamps(t *testing.T) {
 		return
 	}
 
-	_, err = session.GetValidTimestampsOfSystem("hpe", 9996788)
+	_, err = session.GetValidTimestampsOfSystem("hpe", "9996788")
 	if err != nil {
 		t.Error(err)
 		return
@@ -69,7 +69,7 @@ func TestGetTimedSnapshot(t *testing.T) {
 		return
 	}
 
-	timestamps, err := session.GetValidTimestampsOfSystem("hpe", 9996788)
+	timestamps, err := session.GetValidTimestampsOfSystem("hpe", "9996788")
 	if err != nil {
 		t.Error(err)
 		return
@@ -79,7 +79,7 @@ func TestGetTimedSnapshot(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	_, err = session.GetTimedSnapshotByTenant("hpe", stamps[0], 9996788)
+	_, err = session.GetSnapshotByTenantSerialNumberAndDate("hpe", "9996788", stamps[0])
 	if err != nil {
 		t.Error(err)
 		return

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"ratdevelopment-backend/DB"
-	"strconv"
 	"strings"
 )
 
@@ -94,7 +93,7 @@ func (env *Env) handleGetValidTimestampsForSerialNumber(w http.ResponseWriter, r
 	serialNumber := q.Get("serialNumber")
 
 	//limit := q.Get("limit")
-  
+
 	if len(tenant) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Must supply a tenant ID")

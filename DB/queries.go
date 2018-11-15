@@ -26,7 +26,7 @@ func (db *DatabaseSession) GetSystemsOfTenant(tenant string) ([]string, error) {
 
 //GetSnapshotByTenantSerialNumberAndDate gets the JSON blob of a system at a specified timestamp
 func (db *DatabaseSession) GetSnapshotByTenantSerialNumberAndDate(tenant, serialNumberString, time string) (string, error) {
-	stamp, err := StringToTimestamp(time)
+	stamp, err := StringToTimestamp(time[1 : len(time)-1])
 	if err != nil {
 		return "", err
 	}
@@ -42,13 +42,14 @@ func (db *DatabaseSession) GetSnapshotByTenantSerialNumberAndDate(tenant, serial
 	return snapshots[0], nil
 }
 
+//TimestampFormat is the format to use in formatting and parsing timestamps
 const TimestampFormat string = time.RFC1123
 
 //TimestampsToStrings converts a time slice to string slice for convenience
 func TimestampsToStrings(times []time.Time) []string {
 	timestamps := make([]string, len(times))
 	for i, stamp := range times {
-		timestamps[i] = "\"" + stamp.Format(timeFormat) + "\""
+		timestamps[i] = "\"" + stamp.Format(TimestampFormat) + "\""
 	}
 	return timestamps
 }
