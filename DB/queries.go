@@ -1,14 +1,15 @@
 package DB
 
 import (
+	"strconv"
 	"time"
 )
 
 //FileBrowserDBSession is an interface for querying the database session
 type FileBrowserDBSession interface {
 	GetLatestSnapshotsByTenant(string) ([]string, error)
-	GetTimedSnapshotByTenant(string, string, int) (string, error)
-	GetValidTimestampsOfSystem(string, int) ([]time.Time, error)
+	GetSnapshotByTenantSerialNumberAndDate(string, string, string) (string, error)
+	GetValidTimestampsOfSystem(string, string) ([]time.Time, error)
 	GetSystemsOfTenant(string) ([]string, error)
 }
 
@@ -23,9 +24,14 @@ func (db *DatabaseSession) GetSystemsOfTenant(tenant string) ([]string, error) {
 
 }
 
-//GetTimedSnapshotByTenant gets the JSON blob of a system at a specified timestamp
-func (db *DatabaseSession) GetTimedSnapshotByTenant(tenant, time string, serialNumber int) (string, error) {
+//GetSnapshotByTenantSerialNumberAndDate gets the JSON blob of a system at a specified timestamp
+func (db *DatabaseSession) GetSnapshotByTenantSerialNumberAndDate(tenant, serialNumberString, time string) (string, error) {
 	stamp, err := StringToTimestamp(time)
+	if err != nil {
+		return "", err
+	}
+
+	serialNumber, err := strconv.Atoi(serialNumberString)
 	if err != nil {
 		return "", err
 	}
@@ -36,7 +42,7 @@ func (db *DatabaseSession) GetTimedSnapshotByTenant(tenant, time string, serialN
 	return snapshots[0], nil
 }
 
-const timeFormat string = time.RFC1123
+const TimestampFormat string = time.RFC1123
 
 //TimestampsToStrings converts a time slice to string slice for convenience
 func TimestampsToStrings(times []time.Time) []string {
@@ -49,11 +55,16 @@ func TimestampsToStrings(times []time.Time) []string {
 
 //StringToTimestamp parses a timestamp to a time object for use in queries
 func StringToTimestamp(stamp string) (time.Time, error) {
-	return time.Parse(timeFormat, stamp)
+	return time.Parse(TimestampFormat, stamp)
 }
 
 //GetValidTimestampsOfSystem returns a slice of strings that represent valid timestamps to index by for a system
-func (db *DatabaseSession) GetValidTimestampsOfSystem(tenant string, serialNumber int) ([]time.Time, error) {
+func (db *DatabaseSession) GetValidTimestampsOfSystem(tenant, serialNumberString string) ([]time.Time, error) {
+	serialNumber, err := strconv.Atoi(serialNumberString)
+	if err != nil {
+		return nil, err
+	}
+	println(tenant, " ", serialNumber)
 	iter := db.Session.Query("SELECT time FROM snapshots_by_serial_number WHERE tenant = ? AND serial_number = ?", tenant, serialNumber).Iter()
 	stamps := make([]time.Time, 0, iter.NumRows())
 	var stamp time.Time
