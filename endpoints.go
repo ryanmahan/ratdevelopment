@@ -77,7 +77,7 @@ func (env *Env) handleGetSnapshotByTenantSerialNumberAndDate(w http.ResponseWrit
 	w.Header().Set("Content-Type", "application/json")
 	if download == "1" {
 		w.Header().Del("Content-Disposition")
-		w.Header().Set("Content-Disposition", "attachment; filename="+serialNumberString+".json")
+		w.Header().Set("Content-Disposition", "attachment; filename=\""+serialNumberString+"-"+timestamp+".json\"")
 	}
 
 	fmt.Fprint(w, snapshot)
