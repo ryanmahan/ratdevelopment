@@ -17,7 +17,6 @@ func (env *Env) handleGetLatestSnapshotByTenant(w http.ResponseWriter, r *http.R
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-
 	q := r.URL.Query()
 	tenant := q.Get("tenant")
 	//limit := q.Get("limit")
