@@ -26,7 +26,7 @@ func (db *DatabaseSession) GetSystemsOfTenant(tenant string) ([]string, error) {
 
 //GetSnapshotByTenantSerialNumberAndDate gets the JSON blob of a system at a specified timestamp
 func (db *DatabaseSession) GetSnapshotByTenantSerialNumberAndDate(tenant, serialNumberString, time string) (string, error) {
-	stamp, err := StringToTimestamp(time[1 : len(time)-1])
+	stamp, err := StringToTimestamp(time)
 	if err != nil {
 		return "", err
 	}
@@ -49,7 +49,7 @@ const TimestampFormat string = time.RFC1123
 func TimestampsToStrings(times []time.Time) []string {
 	timestamps := make([]string, len(times))
 	for i, stamp := range times {
-		timestamps[i] = "\"" + stamp.Format(TimestampFormat) + "\""
+		timestamps[i] = stamp.Format(TimestampFormat)
 	}
 	return timestamps
 }
