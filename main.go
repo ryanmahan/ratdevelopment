@@ -3,10 +3,11 @@ package main
 import (
 	"flag"
 	"github.com/rs/cors"
-	"log"
-	"net/http"
 	"os"
 	"ratdevelopment-backend/DB"
+	"ratdevelopment-backend/api"
+	"net/http"
+	"log"
 )
 
 var (
@@ -40,21 +41,35 @@ func init() {
 var hostIPs string
 
 func main() {
-	session, err := DB.NewDBSession(hostIPs)
+
+	databaseSession, err := DB.NewDBSession(hostIPs)
 	if err != nil {
 		log.Fatal(err.Error())
 		return
 	}
-	defer session.Close()
-	env := &Env{session: session}
-	mux := http.NewServeMux()
+	defer databaseSession.Close()
 
-	mux.HandleFunc("/GetLatestSnapshotsByTenant", env.handleGetLatestSnapshotByTenant)
-	mux.HandleFunc("/GetSnapshotByTenantSerialNumberAndDate", env.handleGetSnapshotByTenantSerialNumberAndDate)
-	mux.HandleFunc("/GetValidTimestampsForSerialNumber", env.handleGetValidTimestampsForSerialNumber)
-	mux.HandleFunc("/GetTenantSystems", env.handleGetTenantSystems)
+	// env := &Env{session: session}
+	// mux := http.NewServeMux()
 
-	handler := cors.Default().Handler(mux)
+	// mux.HandleFunc("/GetLatestSnapshotsByTenant", env.handleGetLatestSnapshotByTenant)
+	// mux.HandleFunc("/GetSnapshotByTenantSerialNumberAndDate", env.handleGetSnapshotByTenantSerialNumberAndDate)
+	// mux.HandleFunc("/GetValidTimestampsForSerialNumber", env.handleGetValidTimestampsForSerialNumber)
+	// mux.HandleFunc("/GetTenantSystems", env.handleGetTenantSystems)
+
+	// create server with database session
+
+
+	server := &api.Server{
+		DBSession: databaseSession,
+	}
+
+	server.InitServer()
+
+	// This redirects all setting of routes to the api package, if this is not called then no routes will be handled
+	server.SetRoutes()
+
+	handler := cors.Default().Handler(server.GetRouter())
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost", "http://localhost:8080", "http://localhost:8081"},
 		AllowCredentials: true,
