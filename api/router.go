@@ -72,14 +72,14 @@ func (s *Server) GetRouter() http.Handler {
 
 // SetRoutes sets the routes that the server will handle, such as the /api/tenant or /api/system GET requests. How this is written is dependent on the type wrapped in the requestRouter struct.
 func (s *Server) SetRoutes() {
-	s.router.HandleFunc("/api/", s.handleAPI()).Methods("GET")
-	s.router.HandleFunc("/api/tenants/", s.tenants()).Methods("GET")
-	s.router.HandleFunc("/api/tenants/{name}/", s.getTenant()).Methods("GET")
-	s.router.HandleFunc("/api/tenants/{name}/snapshots/", s.getLatestSnapshotsByTenant()).Methods("GET")
-	s.router.HandleFunc("/api/tenants/{name}/systems/", s.getTenantSystems()).Methods("GET")
-	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/{timestamp}", s.getSnapshotByTenantSerialNumberAndDate(false)).Methods("GET")
-	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/{timestamp}/download", s.getSnapshotByTenantSerialNumberAndDate(true)).Methods("GET")
-	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/timestamps/", s.getValidTimestampsForSerialNumber()).Methods("GET")
+	s.router.HandleFunc("/api", s.handleAPI()).Methods("GET")
+	s.router.HandleFunc("/api/tenants", s.tenants()).Methods("GET")
+	s.router.HandleFunc("/api/tenants/{name}", s.getTenant()).Methods("GET")
+	s.router.HandleFunc("/api/tenants/{name}/snapshots", s.getLatestSnapshotsByTenant()).Methods("GET")
+	s.router.HandleFunc("/api/tenants/{name}/systems", s.getTenantSystems()).Methods("GET")
+	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/snapshots/{timestamp}", s.getSnapshotByTenantSerialNumberAndDate(false)).Methods("GET")
+	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/snapshots/{timestamp}/download", s.getSnapshotByTenantSerialNumberAndDate(true)).Methods("GET")
+	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/timestamps", s.getValidTimestampsForSerialNumber()).Methods("GET")
 }
 
 // handleAPI is just a test response to the /api/ request
@@ -199,6 +199,8 @@ func (s *Server) getSnapshotByTenantSerialNumberAndDate(download bool) http.Hand
 		tenantName := params["name"]
 		serialNumberString := params["sernum"]
 		timestamp := params["timestamp"]
+
+		s.loggers.Info.Println(timestamp)
 
 		snapshot, err := (*s.DBSession).GetSnapshotByTenantSerialNumberAndDate(tenantName, serialNumberString, timestamp)
 

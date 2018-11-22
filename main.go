@@ -3,37 +3,14 @@ package main
 import (
 	"flag"
 	"github.com/rs/cors"
-	"os"
 	"ratdevelopment-backend/DB"
 	"ratdevelopment-backend/api"
 	"net/http"
 	"log"
 )
 
-var (
-	Trace   *log.Logger
-	Info    *log.Logger
-	Warning *log.Logger
-	Error   *log.Logger
-)
-
 func init() {
 
-	Trace = log.New(os.Stdout,
-		"TRACE: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
-
-	Info = log.New(os.Stdout,
-		"INFO: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
-
-	Warning = log.New(os.Stdout,
-		"WARNING: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
-
-	Error = log.New(os.Stderr,
-		"ERROR: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
 	flag.StringVar(&hostIPs, "cassandra_ips", "10.10.10.31", "Pass the ips of the cassandra hosts")
 	flag.Parse()
 }
