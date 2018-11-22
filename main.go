@@ -34,7 +34,7 @@ func main() {
 	// mux.HandleFunc("/GetValidTimestampsForSerialNumber", env.handleGetValidTimestampsForSerialNumber)
 	// mux.HandleFunc("/GetTenantSystems", env.handleGetTenantSystems)
 
-	// create server with database session
+	// create server with database seloool aaron is ur research hookupssion
 
 
 	server := &api.Server{
