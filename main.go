@@ -26,6 +26,8 @@ func main() {
 	}
 	defer databaseSession.Close()
 
+	// create server with database session
+	// this initialization should be done here, as the above defer must be done before the main loop
 	server := &api.Server{DBSession: databaseSession}
 	server.InitServer(hostIPs)
 
