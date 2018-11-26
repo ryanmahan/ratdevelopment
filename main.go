@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 	"os"
@@ -31,17 +33,34 @@ func init() {
 	Error = log.New(os.Stderr,
 		"ERROR: ",
 		log.Ldate|log.Ltime|log.Lshortfile)
+	flag.StringVar(&hostIPs, "cassandra_ips", "10.10.10.31", "Pass the ips of the cassandra hosts")
+	flag.Parse()
 }
 
+var hostIPs string
+
 func main() {
-	session, err := DB.NewDBSession()
+	session, err := DB.NewDBSession(hostIPs)
 	if err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 	defer session.Close()
 	env := &Env{session: session}
-	//http.Handle("/", http.FileServer(http.Dir("./dist")))
-	http.HandleFunc("/GetLatestSnapshotsByTenant", env.handleGetLatestSnapshotsByTenant)
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/GetLatestSnapshotsByTenant", env.handleGetLatestSnapshotByTenant)
+	mux.HandleFunc("/GetSnapshotByTenantSerialNumberAndDate", env.handleGetSnapshotByTenantSerialNumberAndDate)
+	mux.HandleFunc("/GetValidTimestampsForSerialNumber", env.handleGetValidTimestampsForSerialNumber)
+	mux.HandleFunc("/GetTenantSystems", env.handleGetTenantSystems)
+
+	handler := cors.Default().Handler(mux)
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost", "http://localhost:8080", "http://localhost:8081"},
+		AllowCredentials: true,
+		Debug:            true,
+	})
+	handler = c.Handler(handler)
+
+	log.Fatal(http.ListenAndServe(":8081", handler))
 }
