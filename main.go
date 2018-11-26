@@ -26,25 +26,8 @@ func main() {
 	}
 	defer databaseSession.Close()
 
-	// env := &Env{session: session}
-	// mux := http.NewServeMux()
-
-	// mux.HandleFunc("/GetLatestSnapshotsByTenant", env.handleGetLatestSnapshotByTenant)
-	// mux.HandleFunc("/GetSnapshotByTenantSerialNumberAndDate", env.handleGetSnapshotByTenantSerialNumberAndDate)
-	// mux.HandleFunc("/GetValidTimestampsForSerialNumber", env.handleGetValidTimestampsForSerialNumber)
-	// mux.HandleFunc("/GetTenantSystems", env.handleGetTenantSystems)
-
-	// create server with database seloool aaron is ur research hookupssion
-
-
-	server := &api.Server{
-		DBSession: databaseSession,
-	}
-
-	server.InitServer()
-
-	// This redirects all setting of routes to the api package, if this is not called then no routes will be handled
-	server.SetRoutes()
+	server := &api.Server{DBSession: databaseSession}
+	server.InitServer(hostIPs)
 
 	handler := cors.Default().Handler(server.GetRouter())
 	c := cors.New(cors.Options{

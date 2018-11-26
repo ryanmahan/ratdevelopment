@@ -2,67 +2,31 @@ package api
 
 import (
 	"net/http"
-	"github.com/gorilla/mux"
 	"ratdevelopment-backend/DB"
 	"encoding/json"
 	"fmt"
 	"strings"
-	"log"
-	"os"
 )
-
-// serverOutput is a struct designed to encapsulate the Trace, Info, Warning, and Error loggers that need to be used by the server and handling functions.
-type serverOutput struct {
-	Trace   *log.Logger
-	Info    *log.Logger
-	Warning *log.Logger
-	Error   *log.Logger
-}
-
-// requestRouter is a wrapper for the router. Change this if you'd like to use a different router such as httprouter or roll your own net/http router.
-type requestRouter struct {
-	*mux.Router
-}
 
 // Server is a struct that contains DB session and router info, to better consolidate and modularize API requests.
 type Server struct {
+	// DBSession is essentially a wrapper for the database session, and here for modularity. In the future, defining interfaces that implement multiple databases would be a better option.
 	DBSession *DB.DatabaseSession
-	loggers   *serverOutput
-
-	router    requestRouter
+	loggers   *serverLogs
+	router    *requestRouter
 }
-// DBSession is essentially a wrapper for the database session, and here for modularity. In the future, defining interfaces that implement multiple databases would be a better option.
 
 // InitServer initializes the router and the loggers for the server.
-func (s *Server) InitServer() {
+func (s *Server) InitServer(hostIPs string) {
 
-	// Create Trace, Info, Warning, Error loggers
-	Trace := log.New(os.Stdout,
-		"TRACE: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
-
-	Info := log.New(os.Stdout,
-		"INFO: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
-
-	Warning := log.New(os.Stdout,
-		"WARNING: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
-
-	Error := log.New(os.Stderr,
-		"ERROR: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
-
-	// add loggers to struct
-	s.loggers = &serverOutput{
-		Trace:   Trace,
-		Info:    Info,
-		Warning: Warning,
-		Error:   Error,
-	}
+	// Initalize server loggers. Initialization code for the loggers is contained in serverLogs.go
+	s.loggers = &serverLogs{}
+	s.loggers.initLogs()
 
 	// set router of server to gorilla multiplexer
-	s.router = requestRouter{mux.NewRouter()}
+	s.router = &requestRouter{}
+	s.router.routerInit()
+	s.SetRoutes()
 }
 
 // GetRouter is a function that allows for access to the HTTP Router / Multiplexer. The router is not public since it shouldn't be changed once the server is initialized.
@@ -80,7 +44,13 @@ func (s *Server) SetRoutes() {
 	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/snapshots/{timestamp}", s.getSnapshotByTenantSerialNumberAndDate(false)).Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/snapshots/{timestamp}/download", s.getSnapshotByTenantSerialNumberAndDate(true)).Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/timestamps", s.getValidTimestampsForSerialNumber()).Methods("GET")
+	// We can wrap these handler functions in a call like this:
+	// s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/timestamps", s.isAdmin(s.getValidTimestampsForSerialNumber())).Methods("GET")
+	// and in isAdmin we can check for admin, and call the function contained in the parameters. This is why we return a function in all other methods,
+	// in case there is some validation we need to do.
 }
+
+// Start of handler definitions. These should be identical to the old handler definitions, could potentially be put in their own file if we use something else for our "SetRoutes" method.
 
 // handleAPI is just a test response to the /api/ request
 func (s *Server) handleAPI() http.HandlerFunc {
@@ -94,6 +64,8 @@ func (s *Server) handleAPI() http.HandlerFunc {
 func (s *Server) tenants() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// TODO
+		w.WriteHeader(418)
+		fmt.Fprintf(w, "I am a teapot! This endpoint has not been finished yet.")
 		return
 	}
 }
@@ -105,6 +77,7 @@ func (s *Server) getTenant() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 
 		// TODO refactor this at some point!!
+		// But also this is probably an easy way to return stuff as JSON if we want to convert to that format with other endpoints.
 		type tenantStructure struct {
 			Tenant        string `json:"tenant"`
 			SystemCount   int    `json:"systemCount"`
@@ -113,7 +86,7 @@ func (s *Server) getTenant() http.HandlerFunc {
 		var tenantData tenantStructure
 
 		// Get the name of the tenant from the request
-		params := mux.Vars(r)
+		params := s.router.getParams(r)
 		tenantData.Tenant = params["name"]
 
 		// Get number of systems
@@ -155,7 +128,7 @@ func (s *Server) getTenant() http.HandlerFunc {
 
 func (s *Server) getLatestSnapshotsByTenant() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		params := mux.Vars(r)
+		params := s.router.getParams(r)
 
 		tenantName := params["name"]
 
@@ -175,7 +148,7 @@ func (s *Server) getLatestSnapshotsByTenant() http.HandlerFunc {
 
 func (s *Server) getTenantSystems() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		params := mux.Vars(r)
+		params := s.router.getParams(r)
 
 		tenantName := params["name"]
 
@@ -194,7 +167,7 @@ func (s *Server) getTenantSystems() http.HandlerFunc {
 
 func (s *Server) getSnapshotByTenantSerialNumberAndDate(download bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		params := mux.Vars(r)
+		params := s.router.getParams(r)
 
 		tenantName := params["name"]
 		serialNumberString := params["sernum"]
@@ -223,7 +196,7 @@ func (s *Server) getSnapshotByTenantSerialNumberAndDate(download bool) http.Hand
 
 func (s *Server) getValidTimestampsForSerialNumber() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		params := mux.Vars(r)
+		params := s.router.getParams(r)
 
 		tenantName := params["name"]
 		serialNumber := params["sernum"]
