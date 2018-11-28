@@ -7,8 +7,8 @@ hooks:
   BeforeInstall:
     - location: deployScripts/BeforeInstall.sh
   AfterInstall:
-    - location: /go/src/ratdevelopment-backend/deployScripts/AfterInstall.sh
+    - location: deployScripts/AfterInstall.sh
   ApplicationStart:
-    - location: /go/src/ratdevelopment-backend/deployScripts/ApplicationStart.sh
+    - location: deployScripts/ApplicationStart.sh
   ValidateService:
-    - location: /go/src/ratdevelopment-backend/deployScripts/ValidateService.sh
+    - location: deployScripts/ValidateService.sh

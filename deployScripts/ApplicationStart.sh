@@ -1,6 +1,2 @@
 #!/bin/sh
-ls
-cqlsh < init.cql
-go get
-go build
-./ratdevelopment-backend
+go run ratdevelopment-backend --cassandra_ips 127.0.0.1
