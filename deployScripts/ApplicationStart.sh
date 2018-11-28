@@ -1,1 +1,2 @@
+#!/bin/sh
 ../ratdevelopment-backend
