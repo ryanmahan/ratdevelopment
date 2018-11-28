@@ -1,2 +1,2 @@
 #!/bin/sh
-service cassandra restart
+sudo service cassandra restart
