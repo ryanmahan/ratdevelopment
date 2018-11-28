@@ -1,2 +1,6 @@
 #!/bin/sh
-../ratdevelopment-backend
+ls
+cqlsh < init.cql
+go get
+go build
+./ratdevelopment-backend
