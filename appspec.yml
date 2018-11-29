@@ -6,8 +6,10 @@ files:
 hooks:
   BeforeInstall:
     - location: deployScripts/BeforeInstall.sh
+      location: deployScripts/VerifyCassandra.sh
   AfterInstall:
-    - location: deployScripts/AfterInstall.sh
+    - location: deployScripts/InitSchema.sh
+    - location: deployScripts/BuildApplication.sh
       timeout: 1500
   ApplicationStart:
     - location: deployScripts/ApplicationStart.sh
