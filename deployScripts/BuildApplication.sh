@@ -1,3 +1,4 @@
+#!/bin/sh
 export GOPATH=/go
 cd /go/src/ratdevelopment-backend
 go get
