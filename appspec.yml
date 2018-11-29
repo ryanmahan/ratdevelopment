@@ -10,9 +10,9 @@ hooks:
   AfterInstall:
     - location: deployScripts/InitSchema.sh
     - location: deployScripts/BuildApplication.sh
-      timeout: 1500
+      timeout: 120
   ApplicationStart:
     - location: deployScripts/ApplicationStart.sh
   ValidateService:
     - location: deployScripts/ValidateService.sh
-      timeout: 500
+      timeout: 60
