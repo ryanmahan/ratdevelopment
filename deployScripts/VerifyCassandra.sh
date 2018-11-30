@@ -4,4 +4,4 @@ while ! cqlsh -e 'describe cluster' ; do
 done
 killall go
 rm -rf /go > /goresult.txt
-service cassandra restart
+sudo service cassandra restart
