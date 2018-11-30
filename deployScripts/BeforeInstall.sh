@@ -1,4 +1,4 @@
 #!/bin/sh
 killall go
-sudo rm -rf /go
+sudo rmdir /go
 sudo service cassandra restart
