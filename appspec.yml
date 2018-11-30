@@ -7,12 +7,16 @@ hooks:
   BeforeInstall:
     - location: deployScripts/BeforeInstall.sh
       location: deployScripts/VerifyCassandra.sh
+      runas: root
   AfterInstall:
     - location: deployScripts/InitSchema.sh
     - location: deployScripts/BuildApplication.sh
       timeout: 120
+      runas: root
   ApplicationStart:
     - location: deployScripts/ApplicationStart.sh
+      runas: root
   ValidateService:
     - location: deployScripts/ValidateService.sh
       timeout: 60
+      runas: root
