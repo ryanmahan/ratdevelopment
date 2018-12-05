@@ -1,0 +1,102 @@
+.log-in{
+    background-color: white; 
+    font-family: Arial;
+}
+
+.log-in-two{
+    font-family: Arial;
+    font-size: 32px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    width: 400px;
+}
+
+.login-form{
+    width: 400px;
+}
+
+.required{
+    font-family: Arial;
+    font-size: 14px;
+    color: red;
+}
+
+.free-line{
+    height: 11px;
+}
+
+.user-ID{
+    font-size: 12px;
+    font-family: Arial;
+    margin: 10px 0;
+}
+
+.user-ID-reminder{
+    color: #767676;
+    margin-right: 5px;
+}
+
+.user-ID-forgot-ID{
+    text-decoration: none;
+    color: #333;
+}
+
+.user-ID-forgot-pswd{
+    margin-bottom: 25px;
+}
+
+.user-ID-forgot-pswd-text{
+    text-decoration: none;
+    color: #333;
+    font-size: 12px;
+    font-family: Arial;
+}
+
+.textbox{
+    padding: 10px;
+    width: 377px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+.textbox:focus{
+    box-shadow: inset 0 0 2px #80C6C6;
+    border-color: #80C6C6;
+}
+
+.remember-me{
+    font-size: 14px;
+    padding-left: 7px;
+    color: black;
+    margin-right: 10px;
+    vertical-align: top;
+}
+
+.checkbox{
+    margin-bottom: 41px;
+    box-sizing: border-box;
+}
+
+.login-form-action{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.button-style{
+    border-radius: 2px;
+    background-color: white;
+    font-size: 16px;
+    margin-right: 10px;
+    border: 2px solid #736661;
+    padding: 10px;
+}
+
+.button-style:hover {
+    box-shadow: inset 0 0 2px #736661;
+}
+
+.signin-style{
+    border-color: #80C6C6;
+    margin-right: 0;
+}
+
