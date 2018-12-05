@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"ratdevelopment-backend/DB"
+	"ratdevelopment/DB"
 )
 
 func init() {

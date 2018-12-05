@@ -16,7 +16,7 @@ vagrant up
 
 Make sure you have [go installed on your machine](https://golang.org/doc/install).
 
-Clone this repository into your Go path. The repository should end up in `$GOPATH/src/ratdevelopment-backend`.
+Clone this repository into your Go path. The repository should end up in `$GOPATH/src/ratdevelopment`.
 
 To get Go package dependencies for the branch you are on run:
 ```
@@ -41,13 +41,13 @@ go build
 To start the local go server after you have compiled run:
 #### On Windows:
 ```
-ratdevelopment-backend
+ratdevelopment
 ```
-A permission dialog might also pop up, make sure to allow `ratdevelopment-backend` to access the network.
+A permission dialog might also pop up, make sure to allow `ratdevelopment` to access the network.
 
 #### On Unix:
 ```
-./ratdevelopment-backend
+./ratdevelopment
 ```
 
 ## Before Editing
