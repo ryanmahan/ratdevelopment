@@ -12,6 +12,7 @@ hooks:
     - location: deployScripts/InitSchema.sh
     - location: deployScripts/BuildApplication.sh
       timeout: 120
+      runas: ubuntu
   ApplicationStart:
     - location: deployScripts/ApplicationStart.sh
   ValidateService:
