@@ -1,2 +1,2 @@
 #!/bin/sh
-(go run ratdevelopment-backend --cassandra_ips 127.0.0.1) &
+(go run ratdevelopment --cassandra_ips 127.0.0.1) &
