@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"ratdevelopment-backend/DB"
+	"ratdevelopment/DB"
 	"strings"
 )
 
