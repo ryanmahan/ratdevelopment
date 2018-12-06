@@ -2,7 +2,7 @@ package api
 
 import (
 	"net/http"
-	"ratdevelopment-backend/DB"
+	"ratdevelopment/DB"
 	"encoding/json"
 	"fmt"
 	"strings"
