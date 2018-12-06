@@ -96,11 +96,3 @@ func narrowCapacity(capacity int, comp byte) proposure {
 		return results
 	}
 }
-
-//compares the signs of two integers.  If both are positive or both are negative, or
-func compSign(a, compVal int) bool {
-	if compVal == 0 { //if compVal is 0, then the two values should be equal, so (expected - actual) == 0
-		return a == 0
-	}
-	return a*compVal >= 0 //otherwise, do a comparison
-}
