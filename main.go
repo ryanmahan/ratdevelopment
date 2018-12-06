@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"github.com/rs/cors"
-	"ratdevelopment-backend/DB"
-	"ratdevelopment-backend/api"
+	"ratdevelopment/DB"
+	"ratdevelopment/api"
 	"net/http"
 	"log"
 )

@@ -1,0 +1,12 @@
+@charset "utf-8";
+@import "~bulma/bulma";
+
+// Application-wide layout styles
+body, html {
+    margin: 0px;
+}
+footer {
+    font-size: 14px;
+    margin: 50px 0 20px 0;
+    text-align: center;
+}
