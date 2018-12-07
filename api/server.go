@@ -11,7 +11,7 @@ import (
 // Server is a struct that contains DB session and router info, to better consolidate and modularize API requests.
 type Server struct {
 	// DBSession is essentially a wrapper for the database session, and here for modularity. In the future, defining interfaces that implement multiple databases would be a better option.
-	DBSession *DB.DatabaseSession
+	DBSession DB.FileBrowserDBSession
 	loggers   *serverLogs
 	router    *requestRouter
 }
@@ -90,7 +90,7 @@ func (s *Server) getTenant() http.HandlerFunc {
 		tenantData.Tenant = params["name"]
 
 		// Get number of systems
-		systems, err := (*s.DBSession).GetSystemsOfTenant(tenantData.Tenant)
+		systems, err := (s.DBSession).GetSystemsOfTenant(tenantData.Tenant)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -102,7 +102,7 @@ func (s *Server) getTenant() http.HandlerFunc {
 		tenantData.SystemCount = len(systems)
 
 		// Get the tenant's snapshots
-		snapshots, err := (*s.DBSession).GetLatestSnapshotsByTenant(tenantData.Tenant)
+		snapshots, err := (s.DBSession).GetLatestSnapshotsByTenant(tenantData.Tenant)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -132,7 +132,7 @@ func (s *Server) getLatestSnapshotsByTenant() http.HandlerFunc {
 
 		tenantName := params["name"]
 
-		snapshots, err := (*s.DBSession).GetLatestSnapshotsByTenant(tenantName)
+		snapshots, err := (s.DBSession).GetLatestSnapshotsByTenant(tenantName)
 
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -152,7 +152,7 @@ func (s *Server) getTenantSystems() http.HandlerFunc {
 
 		tenantName := params["name"]
 
-		serialNumberStrings, err := (*s.DBSession).GetSystemsOfTenant(tenantName)
+		serialNumberStrings, err := (s.DBSession).GetSystemsOfTenant(tenantName)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			fmt.Fprintf(w, "Potentially malformed API call, or internal application error!")
@@ -175,7 +175,7 @@ func (s *Server) getSnapshotByTenantSerialNumberAndDate(download bool) http.Hand
 
 		s.loggers.Info.Println(timestamp)
 
-		snapshot, err := (*s.DBSession).GetSnapshotByTenantSerialNumberAndDate(tenantName, serialNumberString, timestamp)
+		snapshot, err := (s.DBSession).GetSnapshotByTenantSerialNumberAndDate(tenantName, serialNumberString, timestamp)
 
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -201,7 +201,7 @@ func (s *Server) getValidTimestampsForSerialNumber() http.HandlerFunc {
 		tenantName := params["name"]
 		serialNumber := params["sernum"]
 
-		timestamps, err := (*s.DBSession).GetValidTimestampsOfSystem(tenantName, serialNumber)
+		timestamps, err := (s.DBSession).GetValidTimestampsOfSystem(tenantName, serialNumber)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			fmt.Fprintf(w, "Potentially malformed API call, or internal application error!")
