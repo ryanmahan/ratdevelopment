@@ -40,6 +40,14 @@ func (db *mockSession) GetValidTimestampsOfSystem(tenant, serialNumber string) (
 	return []time.Time{time.Now()}, nil
 }
 
+func (db *mockSession) GetValidTenants() ([]string, error) {
+	tenants := []string{
+		"hpe",
+		"264593856",
+	}
+	return tenants, nil
+}
+
 func TestGetSerialNumbersOfTenant(t *testing.T) {
 	const expectedObtainedString = "\n...expected = %#v\n...obtained = %#v"
 
@@ -102,6 +110,7 @@ func TestHandleGetLatestSnapshotsByTenantWithTenantID(t *testing.T) {
 	env := Server{
 		DBSession: &mockSession{},
 	}
+
 	env.getLatestSnapshotsByTenant().ServeHTTP(rec, req)
 
 	if http.StatusOK != rec.Code {

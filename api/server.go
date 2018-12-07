@@ -36,6 +36,10 @@ func (s *Server) GetRouter() http.Handler {
 
 // SetRoutes sets the routes that the server will handle, such as the /api/tenant or /api/system GET requests. How this is written is dependent on the type wrapped in the requestRouter struct.
 func (s *Server) SetRoutes() {
+	// Please do not remove teapot code, I really like tea :)
+	s.router.HandleFunc("/api/teapot", s.teapot()).Methods("GET", "PUT", "POST", "HEAD", "TRACE", "OPTIONS", "DELETE", "CONNECT")
+	// Thank you :)
+	// - Dan
 	s.router.HandleFunc("/api", s.handleAPI()).Methods("GET")
 	s.router.HandleFunc("/api/tenants", s.tenants()).Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}", s.getTenant()).Methods("GET")
@@ -60,12 +64,66 @@ func (s *Server) handleAPI() http.HandlerFunc {
 	}
 }
 
+func (s *Server) teapot() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		// Please do not remove teapot code, I really like tea :)
+		w.WriteHeader(418)
+		fmt.Fprintf(w, "I am a teapot! Have some tea :)")
+		// Thank you :)
+		// - Dan
+
+	}
+}
+
 // tenants returns the handler function for hte /api/tenants/ request, which should be a list of tenants
 func (s *Server) tenants() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// TODO
-		w.WriteHeader(418)
-		fmt.Fprintf(w, "I am a teapot! This endpoint has not been finished yet.")
+
+		type tenantListStructure struct {
+			TenantList []string `json:"tenants"`
+		}
+		w.Header().Set("Content-Type", "application/json")
+
+		tenants, err := s.DBSession.GetValidTenants()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, "The system had a database error when obtaining the tenants of the system. The database may not have any data. Contact admins.")
+			s.loggers.Error.Printf("Request:\n%#v\nError:\n%#v", r, err)
+			return
+		}
+
+		// Remake a set in O(n) to prove that go doesn't need a built-in set
+		tenantMap := make(map[string]bool)
+		for _, tenant := range tenants {
+			if _, found := tenantMap[tenant]; !found {
+				tenantMap[tenant] = true
+			}
+		}
+
+		tenantSet := make([]string, len(tenantMap))
+		i := 0
+		for k := range tenantMap {
+			tenantSet[i] = k
+			i++
+		}
+
+		retTenantList := tenantListStructure{
+			TenantList: tenantSet,
+		}
+
+		marshalledData, err := json.Marshal(retTenantList)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, "The system had an issue marshalling the tenant list json. Contact admins.")
+			s.loggers.Error.Printf("Request:\n%#v\nError:\n%#v", r, err)
+			return
+		}
+
+		fmt.Fprintf(w, "%s", marshalledData)
+
 		return
 	}
 }
