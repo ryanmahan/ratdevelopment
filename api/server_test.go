@@ -51,12 +51,17 @@ func (db *mockSession) GetValidTenants() ([]string, error) {
 func TestGetSerialNumbersOfTenant(t *testing.T) {
 	const expectedObtainedString = "\n...expected = %#v\n...obtained = %#v"
 
-	rec := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/api/tenants/hpe/systems", nil)
 	env := Server{
 		DBSession: &mockSession{},
+		router:    &requestRouter{},
 	}
-	env.getTenantSystems().ServeHTTP(rec, req)
+	env.router.routerInit()
+	env.SetRoutes()
+
+	rec := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/api/tenants/hpe/systems", nil)
+
+	env.router.ServeHTTP(rec, req)
 
 	if http.StatusOK != rec.Code {
 		t.Errorf(expectedObtainedString, http.StatusOK, rec.Code)
@@ -76,13 +81,18 @@ func TestGetSerialNumbersOfTenant(t *testing.T) {
 func TestHandleGetLatestSnapshotsByTenantWithTextTenant(t *testing.T) {
 	const expectedObtainedString = "\n...expected = %#v\n...obtained = %#v"
 
+	env := Server{
+		DBSession: &mockSession{},
+		router:    &requestRouter{},
+	}
+
+	env.router.routerInit()
+	env.SetRoutes()
+
 	rec := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/tenants/hpe/snapshots", nil)
 
-	env := Server{
-		DBSession: &mockSession{},
-	}
-	env.getLatestSnapshotsByTenant().ServeHTTP(rec, req)
+	env.router.ServeHTTP(rec, req)
 
 	if http.StatusOK != rec.Code {
 		t.Errorf(expectedObtainedString, http.StatusOK, rec.Code)
@@ -104,14 +114,18 @@ func TestHandleGetLatestSnapshotsByTenantWithTextTenant(t *testing.T) {
 func TestHandleGetLatestSnapshotsByTenantWithTenantID(t *testing.T) {
 	const expectedObtainedString = "\n...expected = %#v\n...obtained = %#v"
 
+	env := Server{
+		DBSession: &mockSession{},
+		router:    &requestRouter{},
+	}
+
+	env.router.routerInit()
+	env.SetRoutes()
+
 	rec := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/tenants/264593856/snapshots", nil)
 
-	env := Server{
-		DBSession: &mockSession{},
-	}
-
-	env.getLatestSnapshotsByTenant().ServeHTTP(rec, req)
+	env.router.ServeHTTP(rec, req)
 
 	if http.StatusOK != rec.Code {
 		t.Errorf(expectedObtainedString, http.StatusOK, rec.Code)

@@ -66,7 +66,7 @@ func (db *DatabaseSession) GetValidTimestampsOfSystem(tenant, serialNumberString
 	if err != nil {
 		return nil, err
 	}
-	println(tenant, " ", serialNumber)
+	// println(tenant, " ", serialNumber)
 	iter := db.Session.Query("SELECT time FROM snapshots_by_serial_number WHERE tenant = ? AND serial_number = ?", tenant, serialNumber).Iter()
 	stamps := make([]time.Time, 0, iter.NumRows())
 	var stamp time.Time
