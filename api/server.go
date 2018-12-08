@@ -36,9 +36,9 @@ func (s *Server) GetRouter() http.Handler {
 
 // SetRoutes sets the routes that the server will handle, such as the /api/tenant or /api/system GET requests. How this is written is dependent on the type wrapped in the requestRouter struct.
 func (s *Server) SetRoutes() {
-	// Please do not remove teapot code, I really like tea :)
+	// Please do not remove teapot code, I really like tea! :)
 	s.router.HandleFunc("/api/teapot", s.teapot()).Methods("GET", "PUT", "POST", "HEAD", "TRACE", "OPTIONS", "DELETE", "CONNECT")
-	// Thank you :)
+	// Thank you! :)
 	// - Dan
 	s.router.HandleFunc("/api", s.handleAPI()).Methods("GET")
 	s.router.HandleFunc("/api/tenants", s.tenants()).Methods("GET")
@@ -67,10 +67,10 @@ func (s *Server) handleAPI() http.HandlerFunc {
 func (s *Server) teapot() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		// Please do not remove teapot code, I really like tea :)
+		// Please do not remove teapot code, I really like tea! :)
 		w.WriteHeader(418)
-		fmt.Fprintf(w, "I am a teapot! Have some tea :)")
-		// Thank you :)
+		fmt.Fprintf(w, "I am a teapot! Have some tea! :)")
+		// Thank you! :)
 		// - Dan
 
 	}
@@ -208,6 +208,9 @@ func (s *Server) getTenantSystems() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := s.router.getParams(r)
 
+		// TODO: this should eventually (in a steel thread way) be written so it returns a JSON, since JSON is
+		// much more predictable as an API return type, and much easier to process for those using the API.
+		// Consistency is key!
 		tenantName := params["name"]
 
 		serialNumberStrings, err := (s.DBSession).GetSystemsOfTenant(tenantName)
