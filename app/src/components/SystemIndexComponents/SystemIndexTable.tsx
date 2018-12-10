@@ -1,6 +1,7 @@
 import * as React from "react";
 import '../../sass/custom-bulma.scss';
 import {Link} from "react-router-dom";
+import {SearchBar} from "./SearchBar";
 
 
 //series of getters to help iteration
@@ -71,7 +72,7 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
 
     //This is triggered when this component is mounted
     componentDidMount(){
-        this.getSnapshots()
+        this.getSnapshots(" ")
     }
 
     render() {
@@ -96,19 +97,21 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
     }
 
     //fetch the latest snapshots and then update the state of the table.
-    getSnapshots() {
+    getSnapshots(input: string) {
         //  Make the API call
-        fetch(
-            "http://localhost:8081/GetLatestSnapshotsByTenant?tenant=1200944110"
-        ).then(r => {
-            //  When that returns convert it to json
-            return r.json();
-        }).then( j => {
-            //  Finally set the state of the table to the list of snapshots returned
-            this.setState({
-                snapshots: j
-            })
-        });
+        if(input == " "){
+            fetch(
+                "http://localhost:8081/GetLatestSnapshotsByTenant?tenant=1200944110"
+            ).then(r => {
+                //  When that returns convert it to json
+                return r.json();
+            }).then( j => {
+                //  Finally set the state of the table to the list of snapshots returned
+                this.setState({
+                    snapshots: j
+                })
+            });
+        }
     }
 }
 
