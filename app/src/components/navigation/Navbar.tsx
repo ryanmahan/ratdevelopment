@@ -1,14 +1,36 @@
 import * as React from "react";
-import {Link, NavLink} from "react-router-dom";
+import { Link } from "react-router-dom";
 import '../../sass/custom-bulma.scss';
+import { AppAuthState } from "../../misc/state/constants";
+import { connect } from "react-redux";
+import { AppState } from "../../misc/state/reducers/Reducers";
 
 export interface NavbarProps {
+    authState?: AppAuthState,
     navItems: string[],
     active: number,
     fixed: boolean
 }
 
-export class Navbar extends React.Component<NavbarProps> {
+interface INavbarState {
+    toggled: boolean
+}
+
+class NavbarComponent extends React.Component<NavbarProps, INavbarState> {
+
+    constructor(props: any) {
+        super(props);
+        this.toggleDropdown = this.toggleDropdown.bind(this);
+        this.state = {
+            toggled: false
+        };
+    }
+
+    toggleDropdown() {
+        this.setState({
+            toggled: !this.state.toggled
+        });
+    }
 
     render() {
         let items: any[] = [];
@@ -27,6 +49,11 @@ export class Navbar extends React.Component<NavbarProps> {
             fixed = " is-fixed-top";
         }
 
+        let displayUser = "Account";
+        if (this.props.authState.authenticated) {
+            displayUser = this.props.authState.userName;
+        }
+
         return (
             <nav className={"navbar" + fixed} role="navigation" aria-label="main navigation">
                 <div className="container">
@@ -36,21 +63,47 @@ export class Navbar extends React.Component<NavbarProps> {
                         </Link>
                     </div>
                     <div className="navbar-start">
-                        <NavLink to="/" className="navbar-item">
+                        <Link to="/" className="navbar-item">
                             System Index
-                        </NavLink>
+                        </Link>
                         {items}
                     </div>
+                    <span>{this.state.toggled}</span>
                     <div className="navbar-end">
-                        <Link className="navbar-item level" to="/login">
-                            <span style={{paddingRight: "0.5rem"}}>Account</span>
-                            <span className="icon">
-                                <i className="fas fa-user-circle fa-2x"/>
-                            </span>
-                        </Link>
+                        <div className={"navbar-item level dropdown " + (this.state.toggled ? "is-active" : "")} onClick={() => this.toggleDropdown()} >
+                            <div className="dropdown-trigger">
+                                <Link className="navbar-item level" aria-haspopup="true" aria-controls="dropdown-menu" to="">
+                                    <span style={{paddingRight: "0.5rem"}}>{displayUser}</span>
+                                    <span className="icon">
+                                        <i className="fas fa-user-circle fa-2x"/>
+                                    </span>
+                                </Link>
+                            </div>
+                            <div className="dropdown-menu" id="dropdown-menu" role="menu">
+                                {this.props.authState.authenticated &&
+                                    <div className="dropdown-content">
+                                        <Link to="/logout" className="dropdown-item">Logout</Link>
+                                    </div>
+                                }
+                                {!this.props.authState.authenticated &&
+                                    <div className="dropdown-content">
+                                        <Link to="/login" className="dropdown-item">Login</Link>
+                                        <Link to="/login" className="dropdown-item">Register</Link>
+                                    </div>
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
             </nav>
         );
     }
 }
+
+const mapStateToProps = (state: AppState) => {
+    return {
+        authState: state.auth
+    };
+};
+
+export const Navbar = connect(mapStateToProps)(NavbarComponent);

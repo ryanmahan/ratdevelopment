@@ -20,13 +20,6 @@ function getDate(currentRow: any){
     return currentRow.date;
 }
 
-function getWarning(currentRow: any) {
-    if(Math.trunc(100 * (currentRow.capacity.total.freeTiB / currentRow.capacity.total.sizeTiB)) <= 30){
-
-        return <figure className="image is-24x24 is-pulled-right"><img src="https://img.icons8.com/color/50/000000/high-priority.png" alt="Warning Low Capacity"></img></figure>;
-    }
-}
-
 //constructs a row, key is to assist React efficiency, calls each of the getters for cells and returns
 function createSystemRow(currentRow: any) {
     return <tr key={getSerialNumber(currentRow)}>
@@ -36,7 +29,7 @@ function createSystemRow(currentRow: any) {
                 </Link>
             </td>
             <td>{getCompany(currentRow)}</td>
-            <td>{getCapacity(currentRow)}{getWarning(currentRow)}</td>
+            <td>{getCapacity(currentRow)}</td>
             <td>{getDate(currentRow)}</td>
     </tr>
 }
