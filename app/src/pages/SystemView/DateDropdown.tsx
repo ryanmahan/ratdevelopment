@@ -38,7 +38,6 @@ export class DateDropdown extends React.Component<DateDropdownState> {
         return (
             <div className="select">
                 <select onChange={this.setSnapshotDate}>
-                    <option>Latest</option>
                     {items}
                 </select>
             </div>

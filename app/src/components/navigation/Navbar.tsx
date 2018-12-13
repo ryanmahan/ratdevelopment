@@ -32,14 +32,10 @@ export class Navbar extends React.Component<NavbarProps> {
                 <div className="container">
                     <div className="navbar-brand">
                         <Link className="navbar-item" to="/">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/4/46/Hewlett_Packard_Enterprise_logo.svg"/>
+
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/4/46/Hewlett_Packard_Enterprise_logo.svg"/>
+
                         </Link>
-                    </div>
-                    <div className="navbar-start">
-                        <NavLink to="/" className="navbar-item">
-                            System Index
-                        </NavLink>
-                        {items}
                     </div>
                     <div className="navbar-end">
                         <Link className="navbar-item level" to="/login">

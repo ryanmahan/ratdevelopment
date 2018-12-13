@@ -88,6 +88,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     render() {
         let serialNumber: string = this.state.snapshot.serialNumberInserv;
         let snapshot: any = this.state.snapshot;
+        let date: string = this.state.snapshot.date;
         return (
             <div className="container">
                 <PageTitle title={"Serial Number: " + serialNumber}
@@ -95,11 +96,12 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                 <Divider/>
                 <div className="level">
                     <div className="level-left">
+                        Date: {date}
                     </div>
                     <div className="level-right">
-
-                        <a className="button level-item" onClick={this.downloadJSON}>
-                            <i className="icon fas fa-file-download"/>
+                        <h1></h1>
+                        <a className="button level-item is-large" onClick={this.downloadJSON}>
+                            Download JSON File &nbsp; <i className="icon fas fa-file-download"/>
                         </a>
                     </div>
                 </div>
