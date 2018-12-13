@@ -85,3 +85,18 @@ func TestGetTimedSnapshot(t *testing.T) {
 		return
 	}
 }
+
+func TestGetValidTenant(t *testing.T) {
+	session, err := NewDBSession(host)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	_, err = session.GetValidTenants()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+}

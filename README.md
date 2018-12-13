@@ -41,14 +41,15 @@ go build
 To start the local go server after you have compiled run:
 #### On Windows:
 ```
-ratdevelopment
+go run ratdevelopment
 ```
 A permission dialog might also pop up, make sure to allow `ratdevelopment` to access the network.
 
 #### On Unix:
 ```
-./ratdevelopment
+go run ratdevelopment
 ```
+On Unix, permissions are normally not needed to access the network.
 
 ## Before Editing
 Make sure you set your line endings properly in git:
@@ -145,13 +146,38 @@ TRUNCATE TABLE keyspace.table_name;
 ```
 
 ### HTTP Request Usage
-| HTTP Request | Inputs | Outputs |
-|:--------------|:--------:|---------:|
-| `/GetLatestSnapshotsByTenant` | tenant | Comma Delimited JSON |
-| `/GetSnapshotByTenantSerialNumberAndDate` | tenant, time (RFC1123), serNum | Single JSON |
-| `/GetValidTimestampsForSerialNumber` | tenant, serialNumber | Plain-text array of RFC1123 timestamps |
-| `/GetTenantSystems` | tenant | Plain-text array of serial number strings |
+| HTTP Request                                              | Inputs                         | Outputs                                                                                                                                                |
+| :--------------                                           | :--------:                     | ---------:                                                                                                                                             |
+| `/api/tenants/{tenant}/snapshots`                         | tenant                         | Comma Delimited JSON                                                                                                                                   |
+| `/api/tenants/{tenant}/systems/{serNum}/snapshots/{time}` | tenant, time (RFC1123), serNum | Single JSON                                                                                                                                            |
+| `/api/tenants/{tenant}/systems/{serNum}/timestamps`       | tenant, serialNumber           | Plain-text array of RFC1123 timestamps                                                                                                                 |
+| `/api/tenants/{tenant}/systems`                           | tenant                         | Plain-text array of serial number strings                                                                                                              |
+| `/api/tenants`                                            | None                           | JSON with a key of "tenants" and value of the set of all tenants, expressed as an array                                                                |
+| `/api/tenants/{tenant}`                                   | tenant                         | JSON with keys and values describing the name of the tenant, number of systems, and snapshot count                                                     |
+| `/api/teapot`                                             | None                           | Just says `I am a teapot! Have some tea! :)`. It also ensures total security, usability, and scalability of our microservice, and must not be removed. |
 
-a properly formatted HTTP request will look like `/GetValidTimestampsForSerialNumber?tenant=hpe?serNum=9996788`
+a properly formatted HTTP request will look like `/api/tenants/hpe/systems/9996788/timestamps`
 
-The output of `/GetValidTimestampsForSerialNumber` should be used to populate the `time` field for `/GetSnapshotByTenantSerialNumberAndDate`
+The output of `/api/tenants/{tenant}/systems/{serNum}/timestamps` should be used to populate the `time` field for `/api/tenants/{tenant}/systems/{serNum}/snapshots/{time}`
+
+### Potential Issues
+If you get this error when doing `go run ratdevelopment`:
+```
+2018/12/07 22:22:12 gocql: unable to dial control conn 10.10.10.31: dial tcp 10.10.10.31:9042: i/o timeout
+2018/12/07 22:22:12 gocql: unable to create session: control: unable to connect to initial hosts: dial tcp 10.10.10.31:9042: i/o timeout
+exit status 1
+```
+
+This means you have either not started cassandra, need to restart cassandra, or need to change how you run `ratdevelopment`.
+
+The steps to check whether or not cassandra are working correctly, and to start / restart may vary per operating system.
+
+If you are not using Vagrant, then most likely you will need to start `ratdevelopment` like this:
+
+```
+go run ratdevelopment --cassandra_ips 127.0.0.1
+```
+Or:
+```
+go run ratdevelopment --cassandra_ips localhost
+```

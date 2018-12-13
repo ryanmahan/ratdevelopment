@@ -11,6 +11,7 @@ type FileBrowserDBSession interface {
 	GetSnapshotByTenantSerialNumberAndDate(string, string, string) (string, error)
 	GetValidTimestampsOfSystem(string, string) ([]time.Time, error)
 	GetSystemsOfTenant(string) ([]string, error)
+	GetValidTenants() ([]string, error)
 }
 
 //GetLatestSnapshotsByTenant returns slice of JSON blobs for the latest snapshots of all systems owned by a tenant
@@ -65,7 +66,7 @@ func (db *DatabaseSession) GetValidTimestampsOfSystem(tenant, serialNumberString
 	if err != nil {
 		return nil, err
 	}
-	println(tenant, " ", serialNumber)
+	// println(tenant, " ", serialNumber)
 	iter := db.Session.Query("SELECT time FROM snapshots_by_serial_number WHERE tenant = ? AND serial_number = ?", tenant, serialNumber).Iter()
 	stamps := make([]time.Time, 0, iter.NumRows())
 	var stamp time.Time
@@ -91,4 +92,18 @@ func (db *DatabaseSession) RunQuery(query string, args ...interface{}) ([]string
 		return nil, err
 	}
 	return items, nil
+}
+
+//GetValidTenants is a query that gets an array of valid tenants
+func (db *DatabaseSession) GetValidTenants() ([]string, error) {
+	var tenants []string
+	iter := db.Session.Query("SELECT tenant FROM latest_snapshots_by_tenant").Iter()
+	var tenant string
+	for iter.Scan(&tenant) {
+		tenants = append(tenants, tenant)
+	}
+	if err := iter.Close(); err != nil {
+		return nil, err
+	}
+	return tenants, nil
 }
