@@ -36,9 +36,12 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     }
 
     componentDidMount(){
-        fetch("http://localhost:8081/GetValidTimestampsForSerialNumber" +
-            "?tenant=hpe" +
-            "&serialNumber="+ (this.props.match.params as any).serialNumber
+        fetch("http://localhost:8081/api" +
+              "/tenants/" +
+              "hpe" +
+              "/systems/" +
+               (this.props.match.params as any).serialNumber +
+              "/timestamps"
         ).then(r => {
                 return r.json();
             }
@@ -55,9 +58,13 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                 selectedDate: date,
                 validDates: j
             });
-            return fetch("http://localhost:8081/GetSnapshotByTenantSerialNumberAndDate" +
-                "?tenant=hpe&timestamp=" + date +
-                "&serialNumber="+ (this.props.match.params as any).serialNumber);
+            return fetch("http://localhost:8081/api" +
+                         "/tenants/" +
+                         "hpe" +
+                         "/systems/" +
+                          (this.props.match.params as any).serialNumber +
+                         "/snapshots/" +
+                         date);
         }).then( r => {
             return r.json();
         }).then( j => {
@@ -70,9 +77,13 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     }
 
     reload(date: string){
-        fetch("http://localhost:8081/GetSnapshotByTenantSerialNumberAndDate" +
-            "?tenant=hpe&timestamp=" + date +
-            "&serialNumber="+ (this.props.match.params as any).serialNumber
+        fetch("http://localhost:8081/api" +
+              "/tenants/" +
+              "hpe" +
+              "/systems/" +
+               (this.props.match.params as any).serialNumber +
+              "/snapshots/" +
+              date
         ).then( r =>{
                 return r.json();
         }).then( j => {
@@ -117,10 +128,13 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     downloadJSON(){
         let selectedDate = this.state.selectedDate;
         let serialNumber = this.state.snapshot.serialNumberInserv;
-        window.location.href = "http://localhost:8081/GetSnapshotByTenantSerialNumberAndDate?" +
-            "tenant=hpe" +
-            "&timestamp=" + selectedDate +
-            "&serialNumber=" + serialNumber +
-            "&download=1";
+        window.location.href = "http://localhost:8081/api" +
+                               "/tenants/" +
+                               "hpe" +
+                               "/systems/" +
+                               serialNumber +
+                               "/snapshots/" +
+                               selectedDate +
+                               "/download";
     }
 }

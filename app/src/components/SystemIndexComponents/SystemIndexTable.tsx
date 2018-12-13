@@ -105,20 +105,16 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
     //fetch the latest snapshots and then update the state of the table.
     getSnapshots(input: string) {
         //  Make the API call
-        if(input == " "){
-            fetch(
-                "http://localhost:8081/GetLatestSnapshotsByTenant?tenant=1200944110"
-            ).then(r => {
-                //  When that returns convert it to json
-                return r.json();
-            }).then( j => {
-                //  Finally set the state of the table to the list of snapshots returned
-                this.setState({
-                    snapshots: j
-                })
-            });
-        }
+        fetch(
+            "http://localhost:8081/api/tenants/1200944110/snapshots"
+        ).then(r => {
+            //  When that returns convert it to json
+            return r.json();
+        }).then( j => {
+            //  Finally set the state of the table to the list of snapshots returned
+            this.setState({
+                snapshots: j
+            })
+        });
     }
 }
-
-

@@ -3,36 +3,14 @@ package main
 import (
 	"flag"
 	"github.com/rs/cors"
-	"log"
-	"net/http"
-	"os"
 	"ratdevelopment/DB"
-)
-
-var (
-	Trace   *log.Logger
-	Info    *log.Logger
-	Warning *log.Logger
-	Error   *log.Logger
+	"ratdevelopment/api"
+	"net/http"
+	"log"
 )
 
 func init() {
 
-	Trace = log.New(os.Stdout,
-		"TRACE: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
-
-	Info = log.New(os.Stdout,
-		"INFO: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
-
-	Warning = log.New(os.Stdout,
-		"WARNING: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
-
-	Error = log.New(os.Stderr,
-		"ERROR: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
 	flag.StringVar(&hostIPs, "cassandra_ips", "10.10.10.31", "Pass the ips of the cassandra hosts")
 	flag.Parse()
 }
@@ -40,21 +18,20 @@ func init() {
 var hostIPs string
 
 func main() {
-	session, err := DB.NewDBSession(hostIPs)
+
+	databaseSession, err := DB.NewDBSession(hostIPs)
 	if err != nil {
 		log.Fatal(err.Error())
 		return
 	}
-	defer session.Close()
-	env := &Env{session: session}
-	mux := http.NewServeMux()
+	defer databaseSession.Close()
 
-	mux.HandleFunc("/GetLatestSnapshotsByTenant", env.handleGetLatestSnapshotByTenant)
-	mux.HandleFunc("/GetSnapshotByTenantSerialNumberAndDate", env.handleGetSnapshotByTenantSerialNumberAndDate)
-	mux.HandleFunc("/GetValidTimestampsForSerialNumber", env.handleGetValidTimestampsForSerialNumber)
-	mux.HandleFunc("/GetTenantSystems", env.handleGetTenantSystems)
+	// create server with database session
+	// this initialization should be done here, as the above defer must be done before the main loop
+	server := &api.Server{DBSession: databaseSession}
+	server.InitServer(hostIPs)
 
-	handler := cors.Default().Handler(mux)
+	handler := cors.Default().Handler(server.GetRouter())
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost", "http://localhost:8080", "http://localhost:8081"},
 		AllowCredentials: true,
