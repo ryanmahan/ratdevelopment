@@ -14,23 +14,19 @@ function getCompany(currentRow: any){
 }
 
 function getCapacity(currentRow: any){
-    return Math.trunc(100 * (currentRow.capacity.total.freeTiB / currentRow.capacity.total.sizeTiB)) + "%";
+    return 100 - Math.trunc(100 * (currentRow.capacity.total.freeTiB / currentRow.capacity.total.sizeTiB));
 }
 
 function getDate(currentRow: any){
     return currentRow.date;
 }
 
-function getWarning(currentRow: any) {
-    if(Math.trunc(100 * (currentRow.capacity.total.freeTiB / currentRow.capacity.total.sizeTiB)) <= 30){
-        return "Low Capacity: ";
-    }
-}
-
 function getWarningImage(currentRow: any) {
     if(Math.trunc(100 * (currentRow.capacity.total.freeTiB / currentRow.capacity.total.sizeTiB)) <= 30){
 
-        return <figure className="image is-24x24 is-pulled-right"><img src="https://img.icons8.com/color/50/000000/high-priority.png" alt="Warning Low Capacity" title= "Warning: Capacity below 30%"></img></figure>;
+        return <figure className="image is-24x24 is-pulled-right">
+            <img src="https://img.icons8.com/color/50/000000/high-priority.png" alt="Warning Low Capacity" title= "Warning: Capacity below 30%"></img>
+        </figure>;
     }
 }
 
@@ -43,7 +39,17 @@ function createSystemRow(currentRow: any) {
                 </Link>
             </td>
             <td>{getCompany(currentRow)}</td>
-            <td>{getWarning(currentRow)}{getCapacity(currentRow)}{getWarningImage(currentRow)}</td>
+            <td>
+                <div className="columns">
+                    <div className="column">
+                        <progress className="progress is-primary" value={getCapacity(currentRow).toString()} max="100">{getCapacity(currentRow)}</progress>
+                        {getCapacity(currentRow)}% used
+                    </div>
+                    <div className="column is-2">
+                        {getWarningImage(currentRow)}
+                    </div>
+                </div>
+            </td>
             <td>{getDate(currentRow)}</td>
     </tr>
 }
@@ -88,7 +94,7 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
                 <tr>
                     <th>Serial Number</th>
                     <th>Company</th>
-                    <th>Capacity Free</th>
+                    <th>Data Used</th>
                     <th>Last Updated</th>
                 </tr>
                 </thead>
