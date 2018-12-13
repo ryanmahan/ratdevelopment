@@ -156,9 +156,9 @@ TRUNCATE TABLE keyspace.table_name;
 | `/api/tenants/{tenant}`                                   | tenant                         | JSON with keys and values describing the name of the tenant, number of systems, and snapshot count                                                     |
 | `/api/teapot`                                             | None                           | Just says `I am a teapot! Have some tea! :)`. It also ensures total security, usability, and scalability of our microservice, and must not be removed. |
 
-a properly formatted HTTP request will look like `/GetValidTimestampsForSerialNumber?tenant=hpe?serNum=9996788`
+a properly formatted HTTP request will look like `/api/tenants/hpe/systems/9996788/timestamps`
 
-The output of `/GetValidTimestampsForSerialNumber` should be used to populate the `time` field for `/GetSnapshotByTenantSerialNumberAndDate`
+The output of `/api/tenants/{tenant}/systems/{serNum}/timestamps` should be used to populate the `time` field for `/api/tenants/{tenant}/systems/{serNum}/snapshots/{time}`
 
 ### Potential Issues
 If you get this error when doing `go run ratdevelopment`:
