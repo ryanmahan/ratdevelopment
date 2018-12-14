@@ -58,7 +58,7 @@ func main() {
 		if !fileInfo.IsDir() {
 
 			count++
-			fmt.Printf("Processessing file #%d\n", count)
+			fmt.Printf("\rProcessessing file #%d", count)
 
 			// open the file, need to include the path as the fileInfo doesnt include it
 			sys_file, err := os.Open(path + fileInfo.Name())
