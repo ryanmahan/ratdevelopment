@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"strconv"
 )
 
 // Server is a struct that contains DB session and router info, to better consolidate and modularize API requests.
@@ -48,6 +49,7 @@ func (s *Server) SetRoutes() {
 	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/snapshots/{timestamp}", s.getSnapshotByTenantSerialNumberAndDate(false)).Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/snapshots/{timestamp}/download", s.getSnapshotByTenantSerialNumberAndDate(true)).Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/timestamps", s.getValidTimestampsForSerialNumber()).Methods("GET")
+	s.router.HandleFunc("/api/paginate/tenants/{page}", s.tenantsPaginated()).Methods("GET")
 	// We can wrap these handler functions in a call like this:
 	// s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/timestamps", s.isAdmin(s.getValidTimestampsForSerialNumber())).Methods("GET")
 	// and in isAdmin we can check for admin, and call the function contained in the parameters. This is why we return a function in all other methods,
@@ -272,5 +274,57 @@ func (s *Server) getValidTimestampsForSerialNumber() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		timestampStrings := DB.TimestampsToStrings(timestamps)
 		fmt.Fprintf(w, "[\"%s\"]", strings.Join(timestampStrings, "\",\""))
+	}
+}
+
+func (s *Server) tenantsPaginated() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		params := s.router.getParams(r)
+
+		w.Header().Set("Content-Type", "application/json")
+
+		type tenantPageJSON struct {
+			TenantPage int `json:"tenantPage"`
+			LastPage bool `json:"lastPage"`
+			TenantCount int `json:"tenantCount"`
+			Tenants []string `json:"tenants"`
+		}
+		var tenantData tenantPageJSON
+
+		tenantPage := params["page"]
+		page, err := strconv.Atoi(tenantPage)
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "Potentially malformed API call, or internal application error!")
+			s.loggers.Error.Printf("Request:\n%#v\nError:\n%#v", r, err)
+		}
+
+		pageOfTenants, pageReturned, lastPage, err := (s.DBSession).GetTenantPage(100, page)
+
+		tenantData.TenantPage = pageReturned
+		// lastPage is to help the frontend not allow the "next page" button to be active if this is the last page
+		tenantData.LastPage = lastPage
+		tenantData.Tenants = pageOfTenants
+		tenantData.TenantCount = len(pageOfTenants)
+
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, "The pagination returned an error! Please check that you're expecting this to have this many pages.")
+			s.loggers.Error.Printf("Request:\n%#v\nError:\n%#v", r, err)
+		}
+
+		marshalledData, err := json.Marshal(tenantData)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, "The system had an issue marshalling the tenant data json. Contact admins.")
+			s.loggers.Error.Printf("Request:\n%#v\nError:\n%#v", r, err)
+			return
+		}
+
+		fmt.Fprintf(w, "%s", marshalledData)
 	}
 }
