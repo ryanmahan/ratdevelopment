@@ -284,6 +284,9 @@ func (s *Server) tenantsPaginated() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 
+		// TODO: cache the page state in the queries.go file so that you can just get the next page super smoothly, currently if you wanna get page 2 it doesn't care what page you're on
+		// We'll have to keep maybe the page state on the frontend to pass in a request, so we can tell the database to start from there
+		// This should definitely be done in a query parameter, not like our current /api/asdas/{name} fashion, since it's not necessary and you won't always have it
 		type tenantPageJSON struct {
 			TenantPage int `json:"tenantPage"`
 			LastPage bool `json:"lastPage"`
