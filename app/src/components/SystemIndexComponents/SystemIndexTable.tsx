@@ -99,7 +99,7 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
     getSnapshots() {
         //  Make the API call
         fetch(
-            "http://localhost:8081/api/tenants/1200944110/snapshots"
+            process.env.API_URL + "/api/tenants/1200944110/snapshots"
         ).then(r => {
             //  When that returns convert it to json
             return r.json();

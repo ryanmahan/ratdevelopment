@@ -36,7 +36,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     }
 
     componentDidMount(){
-        fetch("http://localhost:8081/api" +
+        fetch(process.env.API_URL + "/api" +
               "/tenants/" +
               "hpe" +
               "/systems/" +
@@ -58,7 +58,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                 selectedDate: date,
                 validDates: j
             });
-            return fetch("http://localhost:8081/api" +
+            return fetch(process.env.API_URL + "/api" +
                          "/tenants/" +
                          "hpe" +
                          "/systems/" +
@@ -77,7 +77,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     }
 
     reload(date: string){
-        fetch("http://localhost:8081/api" +
+        fetch(process.env.API_URL + "/api" +
               "/tenants/" +
               "hpe" +
               "/systems/" +
@@ -126,7 +126,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     downloadJSON(){
         let selectedDate = this.state.selectedDate;
         let serialNumber = this.state.snapshot.serialNumberInserv;
-        window.location.href = "http://localhost:8081/api" +
+        window.location.href = process.env.API_URL + "/api" +
                                "/tenants/" +
                                "hpe" +
                                "/systems/" +
