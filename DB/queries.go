@@ -3,6 +3,8 @@ package DB
 import (
 	"strconv"
 	"time"
+	"github.com/gocql/gocql"
+	"fmt"
 )
 
 //FileBrowserDBSession is an interface for querying the database session
@@ -12,6 +14,7 @@ type FileBrowserDBSession interface {
 	GetValidTimestampsOfSystem(string, string) ([]time.Time, error)
 	GetSystemsOfTenant(string) ([]string, error)
 	GetValidTenants() ([]string, error)
+	GetTenantPage(int, int) ([]string, int, bool, error)
 }
 
 //GetLatestSnapshotsByTenant returns slice of JSON blobs for the latest snapshots of all systems owned by a tenant
@@ -106,4 +109,49 @@ func (db *DatabaseSession) GetValidTenants() ([]string, error) {
 		return nil, err
 	}
 	return tenants, nil
+}
+
+// GetTenantPage gets the next page of the GetValidTenants query given pageSize
+func (db *DatabaseSession) GetTenantPage(pageSize int, page int) ([]string, int, bool, error) {
+	var tenants []string
+	var lastPageState []byte
+
+	var iter *gocql.Iter
+
+	pageReturned := 0
+	isLastPage := false
+	db.Session.SetPageSize(pageSize)
+
+	for i := 0; i < page; i++ {
+		iter = db.Session.Query("SELECT tenant FROM latest_snapshots_by_tenant ALLOW FILTERING").PageState(lastPageState).Iter()
+		lastPageState = iter.PageState()
+
+		pageReturned = i + 1
+		if len(lastPageState) == 0 && i+1 < page {
+
+			// Is it necessary to throw a DB error or should we just return the last page?
+			if err := iter.Close(); err != nil {
+				return nil, 0, false, err
+			}
+
+			return nil, 0, false, gocql.Error{
+				Message: fmt.Sprintf("Tried to get a page past page %d.\n", i+1),
+			}
+
+		} else if len(lastPageState) == 0 {
+			isLastPage = true
+		}
+	}
+
+	var tenant string
+
+	for iter.Scan(&tenant) {
+		tenants = append(tenants, tenant)
+	}
+
+	if err := iter.Close(); err != nil {
+		return nil, 0, false, err
+	}
+
+	return tenants, pageReturned, isLastPage, nil
 }
