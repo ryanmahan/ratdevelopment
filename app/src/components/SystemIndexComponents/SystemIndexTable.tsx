@@ -109,6 +109,7 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
 
     //the table is rendered
     //instead of an outside function iterating, the body is now rendered in a callback function using map
+    //buttons will call sort functions
     render() {
         let newData = this.state.snapshots;
         return (
