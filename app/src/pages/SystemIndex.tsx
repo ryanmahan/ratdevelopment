@@ -9,7 +9,7 @@ import {SystemIndexTable} from "../components/SystemIndexComponents/SystemIndexT
 export interface SystemIndexProps {
 
 }
-
+ 
 export interface SystemIndexState {
     snapshotArray: any[]
 }
