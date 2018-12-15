@@ -10,7 +10,7 @@ import {SearchBar} from "../components/SystemIndexComponents/SearchBar"
 export interface SystemIndexProps {
 
 }
-
+ 
 export interface SystemIndexState {
     snapshotArray: any[]
 }

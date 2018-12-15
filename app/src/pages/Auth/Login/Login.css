@@ -1,10 +1,10 @@
 .log-in{
-    background-color: white; 
-    font-family: Arial;
+    background-color: white;
+    font-family: Arial, sans-serif;
 }
 
 .log-in-two{
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     font-size: 32px;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -16,7 +16,7 @@
 }
 
 .required{
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     font-size: 14px;
     color: red;
 }
@@ -27,7 +27,7 @@
 
 .user-ID{
     font-size: 12px;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     margin: 10px 0;
 }
 
@@ -49,7 +49,7 @@
     text-decoration: none;
     color: #333;
     font-size: 12px;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
 }
 
 .textbox{

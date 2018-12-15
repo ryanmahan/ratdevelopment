@@ -1,5 +1,4 @@
 import * as React from "react";
-import {ChangeEvent} from "react";
 
 export interface DateDropdownState {
     activeDate: string,
