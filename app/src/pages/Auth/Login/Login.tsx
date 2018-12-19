@@ -23,11 +23,12 @@ class LoginComponent extends React.Component<loginProps, loginState> {
         this.onLogin = this.onLogin.bind(this);
     }
     auth = new auth0.WebAuth({
-      domain: 'rat-dev.auth0.com',
-      clientID: 'kGXtSueZuisYoZneXoOOZUm_jJs33lhp',
-      responseType: 'token id_token',
-      redirectUri: 'http://localhost:8080/login',
-      scope: 'openid'
+        domain: 'rat-dev.auth0.com',
+        clientID: 'kGXtSueZuisYoZneXoOOZUm_jJs33lhp',
+        responseType: 'token id_token',
+        scope: 'openid profile read:all',
+        audience: 'https://mousefb/api',
+        redirectUri: 'http://localhost:8080/login'
     });
 
     componentDidMount(){

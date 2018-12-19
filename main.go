@@ -3,10 +3,10 @@ package main
 import (
 	"flag"
 	"github.com/rs/cors"
+	"log"
+	"net/http"
 	"ratdevelopment/DB"
 	"ratdevelopment/api"
-	"net/http"
-	"log"
 )
 
 func init() {
@@ -35,6 +35,7 @@ func main() {
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost", "http://localhost:8080", "http://localhost:8081"},
 		AllowCredentials: true,
+		AllowedHeaders:   []string{"Authorization"},
 		Debug:            true,
 	})
 	handler = c.Handler(handler)
