@@ -62,13 +62,6 @@ class NavbarComponent extends React.Component<NavbarProps, INavbarState> {
                             <img src="https://upload.wikimedia.org/wikipedia/commons/4/46/Hewlett_Packard_Enterprise_logo.svg"/>
                         </Link>
                     </div>
-                    <div className="navbar-start">
-                        <Link to="/" className="navbar-item">
-                            System Index
-                        </Link>
-                        {items}
-                    </div>
-                    <span>{this.state.toggled}</span>
                     <div className="navbar-end">
                         <div className={"navbar-item level dropdown " + (this.state.toggled ? "is-active" : "")} onClick={() => this.toggleDropdown()} >
                             <div className="dropdown-trigger">
