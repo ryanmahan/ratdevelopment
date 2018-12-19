@@ -1,7 +1,7 @@
 import * as React from "react";
 import '../../sass/custom-bulma.scss';
 import {Link} from "react-router-dom";
-
+import {AppAuthState} from "../../misc/state/constants";
 
 //series of getters to help iteration
 function getSerialNumber(currentRow: any){
@@ -54,10 +54,10 @@ function populateSystemTable(array: any[]){
 
 
 export interface SystemIndexTableProps{
-
+    authState: AppAuthState
 }
 
-interface SystemIndexTableState {
+export interface SystemIndexTableState {
     snapshots: any[]
 }
 
@@ -99,7 +99,9 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
     getSnapshots() {
         //  Make the API call
         fetch(
-            "http://localhost:8081/api/tenants/1200944110/snapshots"
+            "http://localhost:8081/api/tenants/1200944110/snapshots",{
+                headers:{Authorization: "BEARER "+this.props.authState.access_token}
+            }
         ).then(r => {
             //  When that returns convert it to json
             return r.json();
