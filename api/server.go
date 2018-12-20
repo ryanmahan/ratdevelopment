@@ -69,7 +69,7 @@ func (s *Server) teapot() http.HandlerFunc {
 
 		// Please do not remove teapot code, I really like tea! :)
 		w.WriteHeader(418)
-		fmt.Fprintf(w, "I am a teapot! Have some tea! :)")
+		fmt.Fprintf(w, "I am a teapot! Have some tea! :)\n" + Teapot())
 		// Thank you! :)
 		// - Dan
 
