@@ -17,10 +17,6 @@ export interface SystemIndexState {
 }
 export class SystemIndex extends React.Component<SystemIndexProps, SystemIndexState> {
 
-    constructor(props: SystemIndexProps){
-        super(props);
-    }
-
     render() {
         return (
             <div className="container">

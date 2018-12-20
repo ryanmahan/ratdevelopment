@@ -4,10 +4,13 @@ import {Divider} from "../components/layout/Divider";
 import {PageTitle} from "../components/layout/PageTitle";
 import {DateDropdown} from "./SystemView/DateDropdown";
 import {match} from "react-router";
+import {AppAuthState} from "../misc/state/constants";
+let fileDownload = require("js-file-download");
 
 export interface SystemViewProps {
     match: match,
-    date: string
+    date: string,
+    authState: AppAuthState
 }
 
 
@@ -41,7 +44,8 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
               "hpe" +
               "/systems/" +
                (this.props.match.params as any).serialNumber +
-              "/timestamps"
+              "/timestamps",
+            {headers:{Authorization: "BEARER "+this.props.authState.access_token}}
         ).then(r => {
                 return r.json();
             }
@@ -64,7 +68,9 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                          "/systems/" +
                           (this.props.match.params as any).serialNumber +
                          "/snapshots/" +
-                         date);
+                         date,
+                {headers:{Authorization: "BEARER "+this.props.authState.access_token}
+                });
         }).then( r => {
             return r.json();
         }).then( j => {
@@ -83,7 +89,9 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
               "/systems/" +
                (this.props.match.params as any).serialNumber +
               "/snapshots/" +
-              date
+              date,
+            {headers:{Authorization: "BEARER "+this.props.authState.access_token}
+            }
         ).then( r =>{
                 return r.json();
         }).then( j => {
@@ -110,7 +118,6 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                         Date: {date}
                     </div>
                     <div className="level-right">
-                        <h1></h1>
                         <a className="button level-item is-large" onClick={this.downloadJSON}>
                             Download JSON File &nbsp; <i className="icon fas fa-file-download"/>
                         </a>
@@ -128,13 +135,28 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     downloadJSON(){
         let selectedDate = this.state.selectedDate;
         let serialNumber = this.state.snapshot.serialNumberInserv;
-        window.location.href = "http://localhost:8081/api" +
-                               "/tenants/" +
-                               "hpe" +
-                               "/systems/" +
-                               serialNumber +
-                               "/snapshots/" +
-                               selectedDate +
-                               "/download";
+
+        let xhr: XMLHttpRequest = new XMLHttpRequest();
+        xhr.open("GET",
+            "http://localhost:8081/api" +
+            "/tenants/" +
+            "hpe" +
+            "/systems/" +
+            serialNumber +
+            "/snapshots/" +
+            selectedDate +
+            "/download");
+        xhr.setRequestHeader('Authorization', "BEARER "+this.props.authState.access_token);
+        xhr.onreadystatechange = function()  {
+            if (this.readyState == this.DONE) {
+                if (this.status === 200) {
+                    let json: any = JSON.parse(this.response);
+                    fileDownload(this.response, json.serialNumberInserv+"-"+json.date+".json");
+                } else {
+                    console.error('XHR failed', this);
+                }
+            }
+        };
+        xhr.send();
     }
 }
