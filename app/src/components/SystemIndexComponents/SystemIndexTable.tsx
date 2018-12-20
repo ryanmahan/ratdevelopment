@@ -179,6 +179,8 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
             API_URL + "/api/tenants/1200944110/snapshots"
         ).then(r => {
             //  When that returns convert it to json
+            console.log("yo we doin things")
+            console.log(r)
             return r.json();
         }).then( j => {
             //  Finally set the state of the table to the list of snapshots returned
