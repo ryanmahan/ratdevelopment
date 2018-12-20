@@ -36,7 +36,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     }
 
     componentDidMount(){
-        fetch("http://localhost:8081/api" +
+        fetch(process.env.API_URL + "/api" +
               "/tenants/" +
               "hpe" +
               "/systems/" +
@@ -58,7 +58,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                 selectedDate: date,
                 validDates: j
             });
-            return fetch("http://localhost:8081/api" +
+            return fetch(process.env.API_URL + "/api" +
                          "/tenants/" +
                          "hpe" +
                          "/systems/" +
@@ -77,7 +77,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     }
 
     reload(date: string){
-        fetch("http://localhost:8081/api" +
+        fetch(process.env.API_URL + "/api" +
               "/tenants/" +
               "hpe" +
               "/systems/" +
@@ -99,6 +99,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     render() {
         let serialNumber: string = this.state.snapshot.serialNumberInserv;
         let snapshot: any = this.state.snapshot;
+        let date: string = this.state.snapshot.date;
         return (
             <div className="container">
                 <PageTitle title={"Serial Number: " + serialNumber}
@@ -106,11 +107,12 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                 <Divider/>
                 <div className="level">
                     <div className="level-left">
+                        Date: {date}
                     </div>
                     <div className="level-right">
-
-                        <a className="button level-item" onClick={this.downloadJSON}>
-                            <i className="icon fas fa-file-download"/>
+                        <h1></h1>
+                        <a className="button level-item is-large" onClick={this.downloadJSON}>
+                            Download JSON File &nbsp; <i className="icon fas fa-file-download"/>
                         </a>
                     </div>
                 </div>
@@ -126,7 +128,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     downloadJSON(){
         let selectedDate = this.state.selectedDate;
         let serialNumber = this.state.snapshot.serialNumberInserv;
-        window.location.href = "http://localhost:8081/api" +
+        window.location.href = process.env.API_URL + "/api" +
                                "/tenants/" +
                                "hpe" +
                                "/systems/" +

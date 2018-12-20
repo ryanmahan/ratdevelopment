@@ -1,5 +1,4 @@
 import * as React from "react";
-import {ChangeEvent} from "react";
 
 export interface DateDropdownState {
     activeDate: string,
@@ -38,7 +37,6 @@ export class DateDropdown extends React.Component<DateDropdownState> {
         return (
             <div className="select">
                 <select onChange={this.setSnapshotDate}>
-                    <option>Latest</option>
                     {items}
                 </select>
             </div>

@@ -3,10 +3,15 @@
 
 // Application-wide layout styles
 body, html {
-    margin: 0px;
+    margin: 0;
 }
 footer {
     font-size: 14px;
     margin: 50px 0 20px 0;
     text-align: center;
 }
+.navbar-item img {
+    max-height: 3rem;
+}
+
+

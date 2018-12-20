@@ -9,11 +9,17 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    
+  },
   "devDependencies": {
     "@types/react": "^16.4.16",
     "@types/react-dom": "^16.0.9",
+    "@types/react-redux": "^6.0.10",
     "@types/react-router-dom": "^4.3.1",
+    "@types/redux": "^3.6.0",
+    "@types/auth0-js": "^8.10.0",
+    "auth0-js": "^9.8.2",
     "autoprefixer": "^9.1.5",
     "awesome-typescript-loader": "^5.2.1",
     "bulma": "^0.7.2",
@@ -25,7 +31,9 @@
     "postcss-loader": "^3.0.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
+    "react-redux": "^6.0.0",
     "react-router-dom": "^4.3.1",
+    "redux": "^4.0.1",
     "sass-loader": "^7.1.0",
     "source-map-loader": "^0.2.4",
     "style-loader": "^0.23.1",
