@@ -112,22 +112,17 @@ class LoginComponent extends React.Component<loginProps, loginState> {
         return <div className="log-in">
             <div className="container">
                 <form className="login-form">
-                    <h1 className="log-in-two">Sign in</h1>
+                    <h1 className="log-in-two">Login</h1>
                     <span className="required">Required *</span>
                     <div className="free-line"/>
                     <div>
-                        <label>User ID </label>
+                        <label>Email</label>
                         <span className="required">*</span>
                     </div>
                     <div>
                         <input className="textbox" required onChange={e => this.setState({ userName: e.target.value})} />
                     </div>
-                    <div className="user-ID">
-                        <span className="user-ID-reminder">Your user ID may be your email.</span>
-                        <a className="user-ID-forgot-ID" href="#">
-                            <span>Forgot User ID</span>
-                        </a>
-                    </div>
+                    <br/>
                     <div>
                         <label>Password </label>
                         <span className="required">*</span>
@@ -135,19 +130,11 @@ class LoginComponent extends React.Component<loginProps, loginState> {
                     <div>
                         <input type="password" className="textbox" required onChange={e => this.setState({ password: e.target.value})} />
                     </div>
-                    <div className = "user-ID-forgot-pswd">
-                        <a className= "user-ID-forgot-pswd-text" href="#">
-                            <span>Forgot Password</span>
-                        </a>
-                    </div>
-                    <div className="checkbox">
-                        <label>
-                            <input className="remember-me" type="checkbox"/>Remember me on this computer
-                        </label>
-                    </div>
+
+                    <br/>
                     <div className="login-form-action">
                         <input className="button-style" type="submit" value="Create Account"  onClick={f => this.onSignup(f)}/>
-                        <input className="button-style signin-style" type="submit" value="Sign in"  onClick={e => this.onLogin(e)}/>
+                        <input className="button-style signin-style" type="submit" value="Login"  onClick={e => this.onLogin(e)}/>
                     </div>
                 </form>
             </div>
