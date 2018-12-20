@@ -15,6 +15,15 @@ export interface SystemIndexState {
   searchString: string
 }
 export class SystemIndex extends React.Component<SystemIndexProps, SystemIndexState> {
+
+    constructor(props: SystemIndexProps){
+        super(props);
+        this.state = {
+            snapshotArray: [],
+            searchString: ""
+        };
+    }
+
   handleSearchChange(query: string) {
       this.setState({ snapshotArray: [], searchString: query });
       fetch(
@@ -24,9 +33,9 @@ export class SystemIndex extends React.Component<SystemIndexProps, SystemIndexSt
           return r.json();
       }).then(j => {
           //  Finally set the state of the table to the list of snapshots returned
+          console.log(j)
           this.setState({
               snapshotArray: j,
-              searchString: this.state.searchString
           })
       });
   }
