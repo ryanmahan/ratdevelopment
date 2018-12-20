@@ -25,7 +25,7 @@ export const Router: IRouter[] = [{
     route: "/",
     visible: AUTH_STATUS_LOGGEDIN,
     match: true,
-    main: () => <SystemIndex />
+    main: (props: any) => <SystemIndex {...props}/>
 }, {
     route: "/login",
     visible: AUTH_STATUS_GUEST,
@@ -63,11 +63,13 @@ class CustomRouteComponent extends React.Component<CustomRouteProps, {}> {
     render() {
         const { component: Component, authState, visible, ...args } = this.props;
         return (
-            <Route {...args} render={(routeProps) =>
+            // I don't know if this is the way we should be passing state around but it works.
+            // Please correct if you know a better way.
+            <Route {...args} authState={authState} render={(routeProps) =>
                 ((authState.authenticated && visible === AUTH_STATUS_LOGGEDIN) ||
                     (!authState.authenticated && visible === AUTH_STATUS_GUEST) ||
                     (visible === AUTH_STATUS_ANY)) ? (
-                        <Component {...routeProps} />
+                        <Component authState={authState} {...routeProps} />
                     ) : ((authState.authenticated && visible === AUTH_STATUS_GUEST) ? (
                         <Redirect to={"/"} />) : (
                             <Redirect to={"/login"} />

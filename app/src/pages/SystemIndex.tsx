@@ -3,12 +3,13 @@ import '../sass/custom-bulma.scss';
 import {Divider} from "../components/layout/Divider";
 import {PageTitle} from "../components/layout/PageTitle";
 import {SystemIndexTable} from "../components/SystemIndexComponents/SystemIndexTable";
+import {AppAuthState} from "../misc/state/constants";
 import {SearchBar} from "../components/SystemIndexComponents/SearchBar"
 
 //import * as sample from "./SystemViewComponents/SampleSystem.json";
 
 export interface SystemIndexProps {
-
+    authState: AppAuthState
 }
  
 export interface SystemIndexState {
@@ -16,13 +17,17 @@ export interface SystemIndexState {
 }
 export class SystemIndex extends React.Component<SystemIndexProps, SystemIndexState> {
 
+    constructor(props: SystemIndexProps){
+        super(props);
+    }
+
     render() {
         return (
             <div className="container">
                 <SearchBar/>
                 <PageTitle title={"Systems"}/>
                 <Divider/>
-                <SystemIndexTable/>
+                <SystemIndexTable authState={this.props.authState}/>
             </div>
         )
     }
