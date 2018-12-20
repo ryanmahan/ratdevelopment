@@ -4,6 +4,7 @@ import {Divider} from "../components/layout/Divider";
 import {PageTitle} from "../components/layout/PageTitle";
 import {DateDropdown} from "./SystemView/DateDropdown";
 import {match} from "react-router";
+import {API_URL} from "../misc/state/constants"
 
 export interface SystemViewProps {
     match: match,
@@ -36,7 +37,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     }
 
     componentDidMount(){
-        fetch(process.env.API_URL + "/api" +
+        fetch(API_URL + "/api" +
               "/tenants/" +
               "hpe" +
               "/systems/" +
@@ -58,7 +59,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                 selectedDate: date,
                 validDates: j
             });
-            return fetch(process.env.API_URL + "/api" +
+            return fetch(API_URL + "/api" +
                          "/tenants/" +
                          "hpe" +
                          "/systems/" +
@@ -77,7 +78,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     }
 
     reload(date: string){
-        fetch(process.env.API_URL + "/api" +
+        fetch(API_URL + "/api" +
               "/tenants/" +
               "hpe" +
               "/systems/" +
@@ -128,7 +129,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     downloadJSON(){
         let selectedDate = this.state.selectedDate;
         let serialNumber = this.state.snapshot.serialNumberInserv;
-        window.location.href = process.env.API_URL + "/api" +
+        window.location.href = API_URL + "/api" +
                                "/tenants/" +
                                "hpe" +
                                "/systems/" +

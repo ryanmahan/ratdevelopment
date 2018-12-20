@@ -1,6 +1,7 @@
 import * as React from "react";
 import '../../sass/custom-bulma.scss';
 import {Link} from "react-router-dom";
+import {API_URL} from "../../misc/state/constants"
 
 //reduced getters to only the helpful ones
 function getCapacity(currentRow: any){
@@ -175,7 +176,7 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
     getSnapshots() {
         //  Make the API call
         fetch(
-            process.env.API_URL + "/api/tenants/1200944110/snapshots"
+            API_URL + "/api/tenants/1200944110/snapshots"
         ).then(r => {
             //  When that returns convert it to json
             return r.json();
