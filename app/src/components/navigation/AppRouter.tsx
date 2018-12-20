@@ -7,7 +7,7 @@ import {SystemView} from "../../pages/SystemView";
 import { Error } from "../../pages/Misc/Error";
 import { Logout } from "../../pages/Auth/Logout/Logout";
 import { AppState } from "../../misc/state/reducers/Reducers";
-import { About } from "../../pages/About/about";
+import { About } from "../../pages/About/About";
 import {
     AUTH_STATUS_LOGGEDIN,
     AUTH_STATUS_ANY,
