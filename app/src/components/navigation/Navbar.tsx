@@ -65,12 +65,12 @@ class NavbarComponent extends React.Component<NavbarProps, INavbarState> {
                     <div className="navbar-end">
                         <div className={"navbar-item level dropdown " + (this.state.toggled ? "is-active" : "")} onClick={() => this.toggleDropdown()} >
                             <div className="dropdown-trigger">
-                                <Link className="navbar-item level" aria-haspopup="true" aria-controls="dropdown-menu" to="">
+                                <a className="navbar-item level" aria-haspopup="true" aria-controls="dropdown-menu">
                                     <span style={{paddingRight: "0.5rem"}}>{displayUser}</span>
                                     <span className="icon">
                                         <i className="fas fa-user-circle fa-2x"/>
                                     </span>
-                                </Link>
+                                </a>
                             </div>
                             <div className="dropdown-menu" id="dropdown-menu" role="menu">
                                 {this.props.authState.authenticated &&
