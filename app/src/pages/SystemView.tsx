@@ -22,6 +22,19 @@ export interface SystemViewState {
     validDates: string[]
 }
 
+//reduced getters to only the helpful ones
+function getCapacity(currentRow: any){
+    return 100 - Math.trunc(100 * (currentRow.capacity.total.freeTiB / currentRow.capacity.total.sizeTiB));
+}
+
+function getWarningImage(currentRow: any) {
+    if(Math.trunc(100 * (currentRow.capacity.total.freeTiB / currentRow.capacity.total.sizeTiB)) <= 30){
+        return <figure className="image is-24x24 is-pulled-right">
+            <img src="https://img.icons8.com/color/50/000000/high-priority.png" alt="Warning Low Capacity" title= "Warning: Capacity below 30%"></img>
+        </figure>;
+    }
+}
+
 export class SystemView extends React.Component<SystemViewProps, SystemViewState> {
 
     static defaultProps = {
@@ -78,7 +91,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
         }).then( j => {
             this.setState({
                 snapshot: j
-            })
+            });
         }).catch(reason => {
             console.log(reason);
         })
@@ -116,7 +129,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                            extras={[<DateDropdown reload={this.reload} dates={this.state.validDates} activeDate={this.state.selectedDate}/>]}/>
                 <Divider/>
                 <div className="level">
-                    <div className="level-left title is-5">
+                    <div className="level-left title is-5" style={{margin: "0"}}>
                         {moment(date).utc().format('MMMM Do YYYY, h:mm A')}
                     </div>
                     <div className="level-right">
@@ -125,6 +138,14 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                         </a>
                     </div>
                 </div>
+                {snapshot.capacity && snapshot.capacity.total && (snapshot.capacity.total.freeTiB / snapshot.capacity.total.sizeTiB <= 0.3) &&
+                    <div style={{backgroundColor: "#ffb3b3", color: "#000", padding: "1rem", margin: "0 0 1rem 0"}}>
+                        Warning: Free capacity below 30%
+                        <figure className="image is-24x24 is-pulled-left" style={{marginRight: "1rem"}}>
+                            <img src="https://img.icons8.com/color/50/000000/high-priority.png" alt="Warning: Free capacity below 30%" title="Warning: Free capacity below 30%"></img>
+                        </figure>
+                    </div>
+                }
                 <pre className="highlight">
                     <code className="language-json">
                     {JSON.stringify(snapshot, null, 4)}
