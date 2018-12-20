@@ -1,7 +1,8 @@
 import * as React from "react";
 import '../../sass/custom-bulma.scss';
-import {Link} from "react-router-dom";
-import {API_URL} from "../../misc/state/constants";
+import {Link, withRouter, RouteComponentProps} from "react-router-dom";
+import {API_URL} from "../../misc/state/constants"
+import * as queryString from "query-string";
 import * as moment from 'moment';
 
 //reduced getters to only the helpful ones
@@ -17,8 +18,8 @@ function getWarningImage(currentRow: any) {
     }
 }
 
-export interface SystemIndexTableProps{
-
+export interface SystemIndexTableProps {
+    history?: { push(path: string): void }
 }
 
 interface SystemIndexTableState {
@@ -26,87 +27,124 @@ interface SystemIndexTableState {
 }
 
 //exports the actual table component which calls our fillArray method
-export class SystemIndexTable extends React.Component<SystemIndexTableProps, SystemIndexTableState> {
+class SystemIndexTableComponent extends React.Component<SystemIndexTableProps & RouteComponentProps, SystemIndexTableState> {
 
-    constructor(props: SystemIndexTableProps) {
+    constructor(props: SystemIndexTableProps & RouteComponentProps) {
         super(props);
-        this.state = {snapshots: []};
+        this.state = { snapshots: [] };
         this.onSortSerial = this.onSortSerial.bind(this);
         this.onSortCompany = this.onSortCompany.bind(this);
         this.onSortCapacity = this.onSortCapacity.bind(this);
         this.onSortDate = this.onSortDate.bind(this);
     }
 
-    //This is triggered when this component is mounted
-    componentDidMount(){
-        this.getSnapshots()
+    // This is triggered when this component is mounted
+    componentDidMount() { // fires only the first time
+        this.getSnapshots(() => {
+            const values = queryString.parse(this.props.location.search);
+            this.performSort(values);
+        })
     }
 
-    //variables which keep track of the states ordering
-    serialOrder = 0;
-    companyOrder = 0;
-    capacityOrder = 0;
-    dateOrder = 0;
+    componentDidUpdate(prevProps: any) { // fires all subsequent times except first
+        const values = queryString.parse(this.props.location.search);
+        const prevValues = queryString.parse(prevProps.location.search);
+        if ((values.filter !== prevValues.filter) || (values.order !== prevValues.order)) {
+            // determines if anything has been updated
+            this.performSort(values);
+        }
+    }
+
+    performSort(values: any) {
+        const filterColumn = values.filter;
+        const filterOrder = values.order;
+
+        if (filterColumn != null && filterOrder != null) {
+            let sortOrder: number = 0;
+            if (filterColumn === "serial") {
+                if (filterOrder === "asc") { 
+                    // if ascending
+                    sortOrder = 0;
+                } else if (filterOrder === "desc") { 
+                    // if descending
+                    sortOrder = 1;
+                }
+                this.onSortSerial("serialNumberInserv", sortOrder);
+            } else if (filterColumn === "company") {
+                if (filterOrder === "asc") { 
+                    sortOrder = 0;
+                } else if (filterOrder === "desc") {
+                    sortOrder = 1;
+                }
+                this.onSortCompany("companyName", sortOrder);
+            } else if (filterColumn === "capacity") {
+                if (filterOrder === "asc") { 
+                    sortOrder = 0;
+                } else if (filterOrder === "desc") { 
+                    sortOrder = 1;
+                }
+                this.onSortCapacity("freeTiB", "sizeTiB", sortOrder);
+            } else if (filterColumn === "date") {
+                if (filterOrder === "asc") {
+                    sortOrder = 0;
+                } else if (filterOrder === "desc") {
+                    sortOrder = 1;
+                }
+                this.onSortDate("date", sortOrder);
+            }
+        }
+    }
+
+    applyFilter(columnName: string) {
+        const values = queryString.parse(this.props.location.search);
+        const filterOrder = values.order;
+        if (filterOrder === "asc") { // if current order is ascending 
+            this.props.history.push("/?filter=" + columnName + "&order=desc"); // clicking sort with make order descending
+        }
+        else {
+            this.props.history.push("/?filter=" + columnName + "&order=asc");
+        }
+    }
 
     //onSort methods take the button click event and will either a)sort the list if unsorted or b)reverse the list if already sorted
-    onSortSerial(event: any, sortKey: any){
+    onSortSerial(sortKey: any, order: number) {
         const snapshots = this.state.snapshots;
-        if(this.serialOrder == 0){
-            snapshots.sort((a,b) => a[sortKey].localeCompare(b[sortKey]));
-            this.serialOrder = 1;
-            this.companyOrder = 0;
-            this.capacityOrder = 0;
-            this.dateOrder = 0;
+        if (order === 0) {
+            snapshots.sort((a, b) => a[sortKey].localeCompare(b[sortKey]));
+        } else {
+            snapshots.sort((a, b) => b[sortKey].localeCompare(a[sortKey]));
         }
-        else{
-            snapshots.reverse();
-        }
-        this.setState({snapshots});
+        this.setState({ snapshots });
     }
 
-    onSortCompany(event: any, sortKey: any){
+    onSortCompany(sortKey: any, order: number) {
         const snapshots = this.state.snapshots;
-        if (this.companyOrder == 0){
-            snapshots.sort((a,b) => a.system[sortKey].localeCompare(b.system[sortKey]));
-            this.serialOrder = 0;
-            this.companyOrder = 1;
-            this.capacityOrder = 0;
-            this.dateOrder = 0;
+        if (order === 0){
+            snapshots.sort((a, b) => a.system[sortKey].localeCompare(b.system[sortKey]));
+        } else {
+            snapshots.sort((a, b) => b.system[sortKey].localeCompare(a.system[sortKey]));
         }
-        else{
-            snapshots.reverse();
-        }
-        this.setState({snapshots});
+        this.setState({ snapshots });
     }
 
-    onSortCapacity(event: any, sortKey: any, sortKey2: any){
+    onSortCapacity(sortKey: any, sortKey2: any, order: number) {
         const snapshots = this.state.snapshots;
-        if(this.capacityOrder == 0){
-            snapshots.sort((a,b) => ((a.capacity.total[sortKey]/a.capacity.total[sortKey2]).toString().localeCompare((b.capacity.total[sortKey]/b.capacity.total[sortKey2]).toString())));
-            this.serialOrder = 0;
-            this.companyOrder = 0;
-            this.capacityOrder = 1;
-            this.dateOrder = 0;
+        if (order === 0) {
+            snapshots.sort((a, b) => ((b.capacity.total[sortKey]/b.capacity.total[sortKey2]).toString().localeCompare((a.capacity.total[sortKey]/a.capacity.total[sortKey2]).toString())));
+        } else {
+            snapshots.sort((a, b) => ((a.capacity.total[sortKey]/a.capacity.total[sortKey2]).toString().localeCompare((b.capacity.total[sortKey]/b.capacity.total[sortKey2]).toString())));
         }
-        else{
-            snapshots.reverse();
-        }
-        this.setState({snapshots});
+        this.setState({ snapshots });
     }
 
-    onSortDate(event: any, sortKey: any){
+    onSortDate(sortKey: any, order: number) {
         const snapshots = this.state.snapshots;
-        if(this.dateOrder == 0){
-            snapshots.sort((a,b) => a[sortKey].localeCompare(b[sortKey]));
-            this.serialOrder = 0;
-            this.companyOrder = 0;
-            this.capacityOrder = 0;
-            this.dateOrder = 1;
+        if (order === 0) {
+            snapshots.sort((a, b) => a[sortKey].localeCompare(b[sortKey]));
+        } else {
+            snapshots.sort((a, b) => b[sortKey].localeCompare(a[sortKey]));
         }
-        else{
-            snapshots.reverse();
-        }
-        this.setState({snapshots});
+        this.setState({ snapshots });
     }
 
     //the table is rendered
@@ -119,22 +157,22 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
                 <thead>
                 <tr>
                     <th>Serial Number
-                        <button className ="button is-dark is-small is-pulled-right" onClick={e => this.onSortSerial(e, 'serialNumberInserv')}>
+                        <button className ="button is-dark is-small is-pulled-right" onClick={e => this.applyFilter("serial")}>
                             <i className="fas fa-sort"></i>
                         </button>
                     </th>
                     <th>Company
-                        <button className ="button is-dark is-small is-pulled-right" onClick={e => this.onSortCompany(e, 'companyName')}>
+                        <button className ="button is-dark is-small is-pulled-right" onClick={e => this.applyFilter("company")}>
                             <i className="fas fa-sort"></i>
                         </button>
                     </th>
                     <th>Data Used
-                        <button className ="button is-dark is-small is-pulled-right" onClick={e => this.onSortCapacity(e, 'freeTiB', 'sizeTiB')}>
+                        <button className ="button is-dark is-small is-pulled-right" onClick={e => this.applyFilter("capacity")}>
                             <i className="fas fa-sort"></i>
                         </button>
                     </th>
                     <th >Last Updated
-                        <button className ="button is-dark is-small is-pulled-right" onClick={e => this.onSortDate(e, 'date')}>
+                        <button className ="button is-dark is-small is-pulled-right" onClick={e => this.applyFilter("date")}>
                             <i className="fas fa-sort"></i>
                         </button>
                     </th>
@@ -174,18 +212,22 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
     }
 
     //fetch the latest snapshots and then update the state of the table.
-    getSnapshots() {
+    getSnapshots(cb: any) {
         //  Make the API call
         fetch(
             API_URL + "/api/tenants/1200944110/snapshots"
         ).then(r => {
             //  When that returns convert it to json
             return r.json();
-        }).then( j => {
+        }).then(j => {
             //  Finally set the state of the table to the list of snapshots returned
             this.setState({
                 snapshots: j
-            })
+            });
+            cb();
         });
     }
 }
+
+export const SystemIndexTable = withRouter(SystemIndexTableComponent)
+

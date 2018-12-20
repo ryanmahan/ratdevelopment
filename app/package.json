@@ -10,7 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "moment": "^2.23.0"
+    "query-string": "^6.2.0",
+    "moment": "^2.23.0",
+    "query-string": "^6.2.0"
   },
   "devDependencies": {
     "@types/auth0-js": "^8.10.0",
