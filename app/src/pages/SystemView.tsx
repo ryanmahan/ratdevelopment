@@ -22,19 +22,6 @@ export interface SystemViewState {
     validDates: string[]
 }
 
-//reduced getters to only the helpful ones
-function getCapacity(currentRow: any){
-    return 100 - Math.trunc(100 * (currentRow.capacity.total.freeTiB / currentRow.capacity.total.sizeTiB));
-}
-
-function getWarningImage(currentRow: any) {
-    if(Math.trunc(100 * (currentRow.capacity.total.freeTiB / currentRow.capacity.total.sizeTiB)) <= 30){
-        return <figure className="image is-24x24 is-pulled-right">
-            <img src="https://img.icons8.com/color/50/000000/high-priority.png" alt="Warning Low Capacity" title= "Warning: Capacity below 30%"></img>
-        </figure>;
-    }
-}
-
 export class SystemView extends React.Component<SystemViewProps, SystemViewState> {
 
     static defaultProps = {
