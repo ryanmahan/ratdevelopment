@@ -14,7 +14,7 @@ import (
 //SearchQueryToCQL takes a search string and creates a CQL query
 func SearchQueryToCQL(query string) string {
 	if query == "" {
-		return "SELECT snapshot FROM latest_snapshots_by_tenant WHERE tenant = ?"
+		return "SELECT snapshot FROM latest_snapshots_by_tenant WHERE tenant = ? LIMIT 100"
 	}
 	queries := strings.Split(query, ",")
 	for i, q := range queries {
@@ -26,7 +26,7 @@ func SearchQueryToCQL(query string) string {
 		}
 	}
 	addend := strings.Join(queries, " AND ")
-	return fmt.Sprintf("SELECT snapshot FROM latest_snapshots_by_tenant WHERE tenant = ? AND %v ALLOW FILTERING", addend)
+	return fmt.Sprintf("SELECT snapshot FROM latest_snapshots_by_tenant WHERE tenant = ? AND %v LIMIT 100 ALLOW FILTERING", addend)
 }
 
 func isNum(r byte) bool {

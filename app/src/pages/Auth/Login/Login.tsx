@@ -23,11 +23,12 @@ class LoginComponent extends React.Component<loginProps, loginState> {
         this.onLogin = this.onLogin.bind(this);
     }
     auth = new auth0.WebAuth({
-      domain: 'rat-dev.auth0.com',
-      clientID: 'kGXtSueZuisYoZneXoOOZUm_jJs33lhp',
-      responseType: 'token id_token',
-      redirectUri: 'http://localhost:8080/login',
-      scope: 'openid'
+        domain: 'rat-dev.auth0.com',
+        clientID: 'kGXtSueZuisYoZneXoOOZUm_jJs33lhp',
+        responseType: 'token id_token',
+        scope: 'openid profile read:all',
+        audience: 'https://mousefb/api',
+        redirectUri: 'http://localhost:8080/login'
     });
 
     componentDidMount(){
@@ -45,6 +46,20 @@ class LoginComponent extends React.Component<loginProps, loginState> {
           console.log(err['description']);
           alert('Error: ' + err['description']);
         }
+      });
+    }
+
+    signup(usernameVar, passwordVar) {
+      this.auth.signup({
+          connection: 'Username-Password-Authentication',
+          email: usernameVar,
+          password: passwordVar
+        }, function(err) {
+        if (err) {
+          console.log(err['description']);
+          alert('Error: ' + err['description']);
+        }
+        return alert('Successfully Registered!')
       });
     }
 
@@ -71,37 +86,43 @@ class LoginComponent extends React.Component<loginProps, loginState> {
       // navigate to the home route
     }
 
-    onLogin(event: React.FormEvent<HTMLFormElement>) {
+    onLogin(event) {
+        event.preventDefault();
+        const {userName, password} = this.state;
+        if (!(userName && password)) {
+          return;
+        }
+
+        localStorage.setItem('email', userName);
+        this.login(userName, password)
+
+    }
+    onSignup(event) {
         event.preventDefault();
         const {userName, password} = this.state;
         if (!(userName && password)) {
           return;
         }
         localStorage.setItem('email', userName);
-        this.login(userName, password)
+        this.signup(userName, password)
 
     }
 
     render() {
         return <div className="log-in">
             <div className="container">
-                <form className="login-form" onSubmit={e => this.onLogin(e)}>
-                    <h1 className="log-in-two">Sign in</h1>
+                <form className="login-form">
+                    <h1 className="log-in-two">Login</h1>
                     <span className="required">Required *</span>
                     <div className="free-line"/>
                     <div>
-                        <label>User ID </label>
+                        <label>Email</label>
                         <span className="required">*</span>
                     </div>
                     <div>
                         <input className="textbox" required onChange={e => this.setState({ userName: e.target.value})} />
                     </div>
-                    <div className="user-ID">
-                        <span className="user-ID-reminder">Your user ID may be your email.</span>
-                        <a className="user-ID-forgot-ID" href="#">
-                            <span>Forgot User ID</span>
-                        </a>
-                    </div>
+                    <br/>
                     <div>
                         <label>Password </label>
                         <span className="required">*</span>
@@ -109,19 +130,11 @@ class LoginComponent extends React.Component<loginProps, loginState> {
                     <div>
                         <input type="password" className="textbox" required onChange={e => this.setState({ password: e.target.value})} />
                     </div>
-                    <div className = "user-ID-forgot-pswd">
-                        <a className= "user-ID-forgot-pswd-text" href="#">
-                            <span>Forgot Password</span>
-                        </a>
-                    </div>
-                    <div className="checkbox">
-                        <label>
-                            <input className="remember-me" type="checkbox"/>Remember me on this computer
-                        </label>
-                    </div>
+
+                    <br/>
                     <div className="login-form-action">
-                        <button className="button-style" type="button">Create an account</button>
-                        <input className="button-style signin-style" type="submit" value="Sign in" />
+                        <input className="button-style signin-style" type="submit" value="Login"  onClick={e => this.onLogin(e)}/>
+                        <input className="button-style" type="submit" value="Create Account"  onClick={f => this.onSignup(f)}/>
                     </div>
                 </form>
             </div>

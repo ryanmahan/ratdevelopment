@@ -4,10 +4,15 @@ import {Divider} from "../components/layout/Divider";
 import {PageTitle} from "../components/layout/PageTitle";
 import {DateDropdown} from "./SystemView/DateDropdown";
 import {match} from "react-router";
+import {AppAuthState} from "../misc/state/constants";
+let fileDownload = require("js-file-download");
+import {API_URL} from "../misc/state/constants";
+import * as moment from 'moment';
 
 export interface SystemViewProps {
     match: match,
-    date: string
+    date: string,
+    authState: AppAuthState
 }
 
 
@@ -36,12 +41,13 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     }
 
     componentDidMount(){
-        fetch(process.env.API_URL + "/api" +
+        fetch(API_URL + "/api" +
               "/tenants/" +
               "hpe" +
               "/systems/" +
                (this.props.match.params as any).serialNumber +
-              "/timestamps"
+              "/timestamps",
+            {headers:{Authorization: "BEARER "+this.props.authState.access_token}}
         ).then(r => {
                 return r.json();
             }
@@ -58,32 +64,36 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                 selectedDate: date,
                 validDates: j
             });
-            return fetch(process.env.API_URL + "/api" +
+            return fetch(API_URL + "/api" +
                          "/tenants/" +
                          "hpe" +
                          "/systems/" +
                           (this.props.match.params as any).serialNumber +
                          "/snapshots/" +
-                         date);
+                         date,
+                {headers:{Authorization: "BEARER "+this.props.authState.access_token}
+                });
         }).then( r => {
             return r.json();
         }).then( j => {
             this.setState({
                 snapshot: j
-            })
+            });
         }).catch(reason => {
             console.log(reason);
         })
     }
 
     reload(date: string){
-        fetch(process.env.API_URL + "/api" +
+        fetch(API_URL + "/api" +
               "/tenants/" +
               "hpe" +
               "/systems/" +
                (this.props.match.params as any).serialNumber +
               "/snapshots/" +
-              date
+              date,
+            {headers:{Authorization: "BEARER "+this.props.authState.access_token}
+            }
         ).then( r =>{
                 return r.json();
         }).then( j => {
@@ -106,16 +116,23 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                            extras={[<DateDropdown reload={this.reload} dates={this.state.validDates} activeDate={this.state.selectedDate}/>]}/>
                 <Divider/>
                 <div className="level">
-                    <div className="level-left">
-                        Date: {date}
+                    <div className="level-left title is-5" style={{margin: "0"}}>
+                        {moment(date).utc().format('MMMM Do YYYY, h:mm A')}
                     </div>
                     <div className="level-right">
-                        <h1></h1>
                         <a className="button level-item is-large" onClick={this.downloadJSON}>
                             Download JSON File &nbsp; <i className="icon fas fa-file-download"/>
                         </a>
                     </div>
                 </div>
+                {snapshot.capacity && snapshot.capacity.total && (Math.trunc(100 * (snapshot.capacity.total.freeTiB / snapshot.capacity.total.sizeTiB)) <= 30) &&
+                    <div style={{backgroundColor: "#ffb3b3", color: "#000", padding: "1rem", margin: "0 0 1rem 0"}}>
+                        Warning: Free capacity below 30%
+                        <figure className="image is-24x24 is-pulled-left" style={{marginRight: "1rem"}}>
+                            <img src="https://img.icons8.com/color/50/000000/high-priority.png" alt="Warning: Free capacity below 30%" title="Warning: Free capacity below 30%"></img>
+                        </figure>
+                    </div>
+                }
                 <pre className="highlight">
                     <code className="language-json">
                     {JSON.stringify(snapshot, null, 4)}
@@ -128,13 +145,29 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     downloadJSON(){
         let selectedDate = this.state.selectedDate;
         let serialNumber = this.state.snapshot.serialNumberInserv;
-        window.location.href = process.env.API_URL + "/api" +
-                               "/tenants/" +
-                               "hpe" +
-                               "/systems/" +
-                               serialNumber +
-                               "/snapshots/" +
-                               selectedDate +
-                               "/download";
+
+        let xhr: XMLHttpRequest = new XMLHttpRequest();
+        xhr.open("GET",
+            API_URL +
+            "/api" +
+            "/tenants/" +
+            "hpe" +
+            "/systems/" +
+            serialNumber +
+            "/snapshots/" +
+            selectedDate +
+            "/download");
+        xhr.setRequestHeader('Authorization', "BEARER "+this.props.authState.access_token);
+        xhr.onreadystatechange = function()  {
+            if (this.readyState == this.DONE) {
+                if (this.status === 200) {
+                    let json: any = JSON.parse(this.response);
+                    fileDownload(this.response, json.serialNumberInserv+"-"+json.date+".json");
+                } else {
+                    console.error('XHR failed', this);
+                }
+            }
+        };
+        xhr.send();
     }
 }
