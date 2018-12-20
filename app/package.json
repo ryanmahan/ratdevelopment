@@ -9,11 +9,7 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "query-string": "^6.2.0",
-    "moment": "^2.23.0",
-    "query-string": "^6.2.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/auth0-js": "^8.10.0",
     "@types/react": "^16.4.16",
@@ -30,8 +26,10 @@
     "js-file-download": "^0.4.4",
     "json-loader": "^0.5.7",
     "mini-css-extract-plugin": "^0.4.4",
+    "moment": "^2.23.0",
     "node-sass": "^4.9.3",
     "postcss-loader": "^3.0.0",
+    "query-string": "^6.2.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-redux": "^6.0.0",
