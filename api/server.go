@@ -45,12 +45,14 @@ func (s *Server) SetRoutes() {
 	s.router.HandleFunc("/api", s.handleAPI()).Methods("GET")
 	s.router.HandleFunc("/api/tenants", s.tenants()).Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}", s.getTenant()).Methods("GET")
+	s.router.HandleFunc("/api/tenants/{name}/snapshots", s.getLatestSnapshotsByTenant()).Queries("searchString", "{options}").Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}/snapshots", s.getLatestSnapshotsByTenant()).Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}/systems", s.getTenantSystems()).Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/snapshots/{timestamp}", s.getSnapshotByTenantSerialNumberAndDate(false)).Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/snapshots/{timestamp}/download", s.getSnapshotByTenantSerialNumberAndDate(true)).Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/timestamps", s.getValidTimestampsForSerialNumber()).Methods("GET")
 	s.router.HandleFunc("/api/paginate/tenants/{page}", s.tenantsPaginated()).Queries("pageState", "{state}").Methods("GET")
+	s.router.HandleFunc("/api/paginate/tenants/{page}", s.tenantsPaginated()).Methods("GET")
 	s.router.HandleFunc("/api/paginate/tenant/{name}/snapshots/{page}", s.snapshotsPaginated()).Queries("pageState", "{state}").Methods("GET")
 	s.router.HandleFunc("/api/paginate/tenant/{name}/snapshots/{page}", s.snapshotsPaginated()).Methods("GET")
 	// We can wrap these handler functions in a call like this:
@@ -165,7 +167,7 @@ func (s *Server) getTenant() http.HandlerFunc {
 		tenantData.SystemCount = len(systems)
 
 		// Get the tenant's snapshots
-		snapshots, err := (s.DBSession).GetLatestSnapshotsByTenant(tenantData.Tenant)
+		snapshots, err := (s.DBSession).GetLatestSnapshotsByTenant(tenantData.Tenant, "")
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -194,8 +196,9 @@ func (s *Server) getLatestSnapshotsByTenant() http.HandlerFunc {
 		params := s.router.getParams(r)
 
 		tenantName := params["name"]
+		searchString := params["options"]
 
-		snapshots, err := (s.DBSession).GetLatestSnapshotsByTenant(tenantName)
+		snapshots, err := (s.DBSession).GetLatestSnapshotsByTenant(tenantName, searchString)
 
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -420,4 +423,12 @@ func (s *Server) snapshotsPaginated() http.HandlerFunc {
 
 		fmt.Fprintf(w, "%s", marshalledData)
 	}
+
+}
+
+func (s *Server) search() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+
 }
