@@ -103,7 +103,6 @@ class LoginComponent extends React.Component<loginProps, loginState> {
         if (!(userName && password)) {
           return;
         }
-        console.log("signed up")
         localStorage.setItem('email', userName);
         this.signup(userName, password)
 
@@ -134,8 +133,8 @@ class LoginComponent extends React.Component<loginProps, loginState> {
 
                     <br/>
                     <div className="login-form-action">
-                        <input className="button-style" type="submit" value="Create Account"  onClick={f => this.onSignup(f)}/>
                         <input className="button-style signin-style" type="submit" value="Login"  onClick={e => this.onLogin(e)}/>
+                        <input className="button-style" type="submit" value="Create Account"  onClick={f => this.onSignup(f)}/>
                     </div>
                 </form>
             </div>
