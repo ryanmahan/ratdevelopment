@@ -44,7 +44,7 @@ func (db *DatabaseSession) GetSnapshotByTenantSerialNumberAndDate(tenant, serial
 }
 
 //TimestampFormat is the format to use in formatting and parsing timestamps
-const TimestampFormat string = time.RFC1123
+const TimestampFormat string = time.RFC3339
 
 //TimestampsToStrings converts a time slice to string slice for convenience
 func TimestampsToStrings(times []time.Time) []string {
