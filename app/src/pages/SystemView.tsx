@@ -125,7 +125,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                         </a>
                     </div>
                 </div>
-                {snapshot.capacity && snapshot.capacity.total && (snapshot.capacity.total.freeTiB / snapshot.capacity.total.sizeTiB <= 0.3) &&
+                {snapshot.capacity && snapshot.capacity.total && (Math.trunc(100 * (snapshot.capacity.total.freeTiB / snapshot.capacity.total.sizeTiB)) <= 30) &&
                     <div style={{backgroundColor: "#ffb3b3", color: "#000", padding: "1rem", margin: "0 0 1rem 0"}}>
                         Warning: Free capacity below 30%
                         <figure className="image is-24x24 is-pulled-left" style={{marginRight: "1rem"}}>
