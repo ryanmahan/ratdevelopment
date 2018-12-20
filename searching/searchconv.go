@@ -22,7 +22,7 @@ func SearchQueryToCQL(query string) string {
 		if isNum(queries[i][0]) { // is a sernum
 			queries[i] = fmt.Sprintf("serial_string LIKE '%%%v%%'", queries[i])
 		} else { // is a company name
-			queries[i] = fmt.Sprintf("company_name LIKE '%%%v%%'", queries[i])
+			queries[i] = fmt.Sprintf("company_name LIKE '%%%v%%'", strings.ToLower(queries[i]))
 		}
 	}
 	addend := strings.Join(queries, " AND ")
