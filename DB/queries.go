@@ -15,6 +15,7 @@ type FileBrowserDBSession interface {
 	GetSystemsOfTenant(string) ([]string, error)
 	GetValidTenants() ([]string, error)
 	GetTenantPage(int, int) ([]string, int, bool, error)
+	GetSnapshotPageByTenant(string, int, int, []byte) ([]string, int, bool, []byte, error)
 }
 
 //GetLatestSnapshotsByTenant returns slice of JSON blobs for the latest snapshots of all systems owned by a tenant
@@ -154,4 +155,56 @@ func (db *DatabaseSession) GetTenantPage(pageSize int, page int) ([]string, int,
 	}
 
 	return tenants, pageReturned, isLastPage, nil
+}
+
+// GetSnapshotPageByTenant gets the next page of the GetValidTenants query given pageSize
+func (db *DatabaseSession) GetSnapshotPageByTenant(tenant string, pageSize int, page int, startingState []byte) ([]string, int, bool, []byte, error) {
+	var snapshots []string
+	var lastPageState []byte
+	var currPageState []byte
+	lastPageState = startingState
+
+	var iter *gocql.Iter
+
+	pageReturned := 0
+	isLastPage := false
+	db.Session.SetPageSize(pageSize)
+
+	for i := 0; i < page; i++ {
+		iter = db.Session.Query("SELECT snapshot FROM latest_snapshots_by_tenant WHERE tenant = ? ALLOW FILTERING", tenant).PageState(lastPageState).Iter()
+		currPageState = lastPageState
+		lastPageState = iter.PageState()
+
+		pageReturned = i + 1
+		if len(lastPageState) == 0 && i+1 < page {
+
+			// Is it necessary to throw a DB error or should we just return the last page?
+			if err := iter.Close(); err != nil {
+				return nil, 0, false, nil, err
+			}
+
+			return nil, 0, false, nil, gocql.Error{
+				Message: fmt.Sprintf("Tried to get a page past page %d.\n", i+1),
+			}
+
+		} else if len(lastPageState) == 0 {
+			isLastPage = true
+		}
+	}
+
+	var snapshot string
+
+	for iter.Scan(&snapshot) {
+		snapshots = append(snapshots, snapshot)
+	}
+
+	if err := iter.Close(); err != nil {
+		return nil, 0, false, nil, err
+	}
+
+	return snapshots, pageReturned, isLastPage, currPageState, nil
+}
+
+func (s *Server) RunPaginatedQuery() {
+
 }
