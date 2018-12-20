@@ -13,6 +13,6 @@ export const App = () => (
                 <CustomRoute key={num} path={route.route} exact={route.match} component={route.main} visible={route.visible} />
             ))}
         </Switch>
-        <footer>&copy; 2018 HPE®</footer>
+        <footer>&copy; 2018 Rat Development®</footer>
     </div>
 );
