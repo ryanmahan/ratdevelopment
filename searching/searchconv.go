@@ -20,13 +20,13 @@ func SearchQueryToCQL(query string) string {
 	for i, q := range queries {
 		queries[i] = strings.Trim(q, " ")
 		if isNum(queries[i][0]) { // is a sernum
-			queries[i] = fmt.Sprintf("ser_string_index LIKE \"%%%v%%\"", queries[i])
+			queries[i] = fmt.Sprintf("serial_string LIKE '%%%v%%'", queries[i])
 		} else { // is a company name
-			queries[i] = fmt.Sprintf("company_name_index LIKE \"%%%v%%\"", queries[i])
+			queries[i] = fmt.Sprintf("company_name LIKE '%%%v%%'", queries[i])
 		}
 	}
 	addend := strings.Join(queries, " AND ")
-	return fmt.Sprintf("SELECT snapshot FROM latest_snapshots_by_tenant WHERE tenant = ? AND %v", addend)
+	return fmt.Sprintf("SELECT snapshot FROM latest_snapshots_by_tenant WHERE tenant = ? AND %v ALLOW FILTERING", addend)
 }
 
 func isNum(r byte) bool {
