@@ -32,7 +32,6 @@ interface SystemIndexTableState {
 //exports the actual table component which calls our fillArray method
 class SystemIndexTableComponent extends React.Component<SystemIndexTableProps & RouteComponentProps, SystemIndexTableState> {
 
-
     //the table is rendered
     //instead of an outside function iterating, the body is now rendered in a callback function using map
     //buttons will call sort functions
@@ -97,7 +96,6 @@ class SystemIndexTableComponent extends React.Component<SystemIndexTableProps & 
             </table>
         )
     }
-
 
 }
 
