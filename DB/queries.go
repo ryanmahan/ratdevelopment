@@ -1,22 +1,35 @@
 package DB
 
 import (
+	"fmt"
+	"ratdevelopment/searching"
 	"strconv"
 	"time"
+	"github.com/gocql/gocql"
+	"regexp"
 )
 
 //FileBrowserDBSession is an interface for querying the database session
 type FileBrowserDBSession interface {
-	GetLatestSnapshotsByTenant(string) ([]string, error)
+	GetLatestSnapshotsByTenant(string, string) ([]string, error)
 	GetSnapshotByTenantSerialNumberAndDate(string, string, string) (string, error)
 	GetValidTimestampsOfSystem(string, string) ([]time.Time, error)
 	GetSystemsOfTenant(string) ([]string, error)
 	GetValidTenants() ([]string, error)
+	GetTenantPage(int, int) ([]string, int, bool, error)
+	GetSnapshotPageByTenant(string, int, int, []byte) ([]string, int, bool, []byte, error)
 }
 
 //GetLatestSnapshotsByTenant returns slice of JSON blobs for the latest snapshots of all systems owned by a tenant
-func (db *DatabaseSession) GetLatestSnapshotsByTenant(tenant string) ([]string, error) {
-	return db.RunQuery("SELECT snapshot FROM latest_snapshots_by_tenant WHERE tenant = ?", tenant)
+func (db *DatabaseSession) GetLatestSnapshotsByTenant(tenant, searchquery string) ([]string, error) {
+	exp, err := regexp.Compile("^[a-zA-Z0-9\\ \\-\\_]*$")
+	if err != nil {
+		return nil, err
+	}
+	if !exp.MatchString(searchquery) {
+		return nil, fmt.Errorf("Don't do that please")
+	}
+	return db.RunQuery(searching.SearchQueryToCQL(searchquery), tenant)
 }
 
 //GetSystemsOfTenant returns a list of serial numbers a given tenant has access to
@@ -107,3 +120,100 @@ func (db *DatabaseSession) GetValidTenants() ([]string, error) {
 	}
 	return tenants, nil
 }
+
+// GetTenantPage gets the next page of the GetValidTenants query given pageSize
+func (db *DatabaseSession) GetTenantPage(pageSize int, page int) ([]string, int, bool, error) {
+	var tenants []string
+	var lastPageState []byte
+
+	var iter *gocql.Iter
+
+	pageReturned := 0
+	isLastPage := false
+	db.Session.SetPageSize(pageSize)
+
+	for i := 0; i < page; i++ {
+		iter = db.Session.Query("SELECT tenant FROM latest_snapshots_by_tenant ALLOW FILTERING").PageState(lastPageState).Iter()
+		lastPageState = iter.PageState()
+
+		pageReturned = i + 1
+		if len(lastPageState) == 0 && i+1 < page {
+
+			// Is it necessary to throw a DB error or should we just return the last page?
+			if err := iter.Close(); err != nil {
+				return nil, 0, false, err
+			}
+
+			return nil, 0, false, gocql.Error{
+				Message: fmt.Sprintf("Tried to get a page past page %d.\n", i+1),
+			}
+
+		} else if len(lastPageState) == 0 {
+			isLastPage = true
+		}
+	}
+
+	var tenant string
+
+	for iter.Scan(&tenant) {
+		tenants = append(tenants, tenant)
+	}
+
+	if err := iter.Close(); err != nil {
+		return nil, 0, false, err
+	}
+
+	return tenants, pageReturned, isLastPage, nil
+}
+
+// GetSnapshotPageByTenant gets the next page of the GetValidTenants query given pageSize
+func (db *DatabaseSession) GetSnapshotPageByTenant(tenant string, pageSize int, page int, startingState []byte) ([]string, int, bool, []byte, error) {
+	var snapshots []string
+	var lastPageState []byte
+	var currPageState []byte
+	lastPageState = startingState
+
+	var iter *gocql.Iter
+
+	pageReturned := 0
+	isLastPage := false
+	db.Session.SetPageSize(pageSize)
+
+	for i := 0; i < page; i++ {
+		iter = db.Session.Query("SELECT snapshot FROM latest_snapshots_by_tenant WHERE tenant = ? ALLOW FILTERING", tenant).PageState(lastPageState).Iter()
+		currPageState = lastPageState
+		lastPageState = iter.PageState()
+
+		pageReturned = i + 1
+		if len(lastPageState) == 0 && i+1 < page {
+
+			// Is it necessary to throw a DB error or should we just return the last page?
+			if err := iter.Close(); err != nil {
+				return nil, 0, false, nil, err
+			}
+
+			return nil, 0, false, nil, gocql.Error{
+				Message: fmt.Sprintf("Tried to get a page past page %d.\n", i+1),
+			}
+
+		} else if len(lastPageState) == 0 {
+			isLastPage = true
+		}
+	}
+
+	var snapshot string
+
+	for iter.Scan(&snapshot) {
+		snapshots = append(snapshots, snapshot)
+	}
+
+	if err := iter.Close(); err != nil {
+		return nil, 0, false, nil, err
+	}
+
+	return snapshots, pageReturned, isLastPage, currPageState, nil
+}
+
+// func (s *Server) RunPaginatedQuery() {
+
+// }

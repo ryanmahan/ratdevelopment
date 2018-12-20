@@ -9,7 +9,8 @@ import (
 	"net/http"
 	"ratdevelopment/DB"
 	"strings"
-
+	"strconv"
+	"encoding/hex"
 	"github.com/auth0-community/go-auth0"
 	"gopkg.in/square/go-jose.v2"
 )
@@ -78,11 +79,16 @@ func (s *Server) SetRoutes() {
 	s.router.HandleFunc("/api", s.handleAPI()).Methods("GET")
 	s.router.HandleFunc("/api/tenants", s.tenants()).Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}", s.getTenant()).Methods("GET")
+	s.router.HandleFunc("/api/tenants/{name}/snapshots", s.getLatestSnapshotsByTenant()).Queries("searchString", "{options}").Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}/snapshots", s.getLatestSnapshotsByTenant()).Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}/systems", s.getTenantSystems()).Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/snapshots/{timestamp}", s.getSnapshotByTenantSerialNumberAndDate(false)).Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/snapshots/{timestamp}/download", s.getSnapshotByTenantSerialNumberAndDate(true)).Methods("GET")
 	s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/timestamps", s.getValidTimestampsForSerialNumber()).Methods("GET")
+	s.router.HandleFunc("/api/paginate/tenants/{page}", s.tenantsPaginated()).Queries("pageState", "{state}").Methods("GET")
+	s.router.HandleFunc("/api/paginate/tenants/{page}", s.tenantsPaginated()).Methods("GET")
+	s.router.HandleFunc("/api/paginate/tenant/{name}/snapshots/{page}", s.snapshotsPaginated()).Queries("pageState", "{state}").Methods("GET")
+	s.router.HandleFunc("/api/paginate/tenant/{name}/snapshots/{page}", s.snapshotsPaginated()).Methods("GET")
 	// We can wrap these handler functions in a call like this:
 	// s.router.HandleFunc("/api/tenants/{name}/systems/{sernum}/timestamps", s.isAdmin(s.getValidTimestampsForSerialNumber())).Methods("GET")
 	// and in isAdmin we can check for admin, and call the function contained in the parameters. This is why we return a function in all other methods,
@@ -244,7 +250,7 @@ func (s *Server) getTenant() http.HandlerFunc {
 		tenantData.SystemCount = len(systems)
 
 		// Get the tenant's snapshots
-		snapshots, err := (s.DBSession).GetLatestSnapshotsByTenant(tenantData.Tenant)
+		snapshots, err := (s.DBSession).GetLatestSnapshotsByTenant(tenantData.Tenant, "")
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -273,8 +279,9 @@ func (s *Server) getLatestSnapshotsByTenant() http.HandlerFunc {
 		params := s.router.getParams(r)
 
 		tenantName := params["name"]
+		searchString := params["options"]
 
-		snapshots, err := (s.DBSession).GetLatestSnapshotsByTenant(tenantName)
+		snapshots, err := (s.DBSession).GetLatestSnapshotsByTenant(tenantName, searchString)
 
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -357,4 +364,154 @@ func (s *Server) getValidTimestampsForSerialNumber() http.HandlerFunc {
 		timestampStrings := DB.TimestampsToStrings(timestamps)
 		fmt.Fprintf(w, "[\"%s\"]", strings.Join(timestampStrings, "\",\""))
 	}
+}
+
+func (s *Server) tenantsPaginated() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		params := s.router.getParams(r)
+
+		w.Header().Set("Content-Type", "application/json")
+
+		// TODO: cache the page state in the queries.go file so that you can just get the next page super smoothly, currently if you wanna get page 2 it doesn't care what page you're on
+		// We'll have to keep maybe the page state on the frontend to pass in a request, so we can tell the database to start from there
+		// This should definitely be done in a query parameter, not like our current /api/asdas/{name} fashion, since it's not necessary and you won't always have it
+		type tenantPageJSON struct {
+			TenantPage int `json:"tenantPage"`
+			LastPage bool `json:"lastPage"`
+			TenantCount int `json:"tenantCount"`
+			Tenants []string `json:"tenants"`
+		}
+		var tenantData tenantPageJSON
+
+		tenantPage := params["page"]
+		page, err := strconv.Atoi(tenantPage)
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "Potentially malformed API call, or internal application error!")
+			s.loggers.Error.Printf("Request:\n%#v\nError:\n%#v", r, err)
+		}
+
+		pageOfTenants, pageReturned, lastPage, err := (s.DBSession).GetTenantPage(100, page)
+
+		tenantData.TenantPage = pageReturned
+		// lastPage is to help the frontend not allow the "next page" button to be active if this is the last page
+		tenantData.LastPage = lastPage
+		tenantData.Tenants = pageOfTenants
+		tenantData.TenantCount = len(pageOfTenants)
+
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, "The pagination returned an error! Please check that you're expecting this to have this many pages.")
+			s.loggers.Error.Printf("Request:\n%#v\nError:\n%#v", r, err)
+		}
+
+		marshalledData, err := json.Marshal(tenantData)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, "The system had an issue marshalling the tenant data json. Contact admins.")
+			s.loggers.Error.Printf("Request:\n%#v\nError:\n%#v", r, err)
+			return
+		}
+
+		fmt.Fprintf(w, "%s", marshalledData)
+	}
+}
+
+func (s *Server) snapshotsPaginated() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		params := s.router.getParams(r)
+
+		w.Header().Set("Content-Type", "application/json")
+
+		// TODO: cache the page state in the queries.go file so that you can just get the next page super smoothly, currently if you wanna get page 2 it doesn't care what page you're on
+		// We'll have to keep maybe the page state on the frontend to pass in a request, so we can tell the database to start from there
+		// This should definitely be done in a query parameter, not like our current /api/asdas/{name} fashion, since it's not necessary and you won't always have it
+		type snapshotPageJSON struct {
+			PageState string `json:"pageState"`
+			SnapshotPage int `json:"snapshotPage"`
+			LastPage bool `json:"lastPage"`
+			SnapshotCount int `json:"snapshotCount"`
+			Snapshots []Snapshot `json:"snapshots"`
+		}
+
+		var snapshotData snapshotPageJSON
+
+		var state []byte
+		if stateString, found := params["state"]; found {
+			var err error
+			state, err = hex.DecodeString(stateString)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Fprintf(w, "Potentially malformed API call, or internal application error!")
+				s.loggers.Error.Fatal(err)
+				s.loggers.Error.Printf("Request:\n%#v\nError:\n%#v", r, err)
+			}
+		}
+
+		tenant := params["name"]
+		snapshotPage := params["page"]
+
+		page, err := strconv.Atoi(snapshotPage)
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "Potentially malformed API call, or internal application error!")
+			s.loggers.Error.Printf("Request:\n%#v\nError:\n%#v", r, err)
+		}
+
+		pageOfSnapshots, pageReturned, lastPage, pageState, err := (s.DBSession).GetSnapshotPageByTenant(tenant, 100, page, state)
+
+		snapshotData.PageState = hex.EncodeToString(pageState)
+		snapshotData.SnapshotPage = pageReturned
+		// LastPage is to help the frontend not allow the "next page" button to be active if this is the last page
+
+		for _, pg := range pageOfSnapshots  {
+
+			var marshalledPage Snapshot
+			err := json.Unmarshal([]byte(pg), &marshalledPage)
+			if err != nil {
+				println(pg)
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprintf(w, "The system had an issue marshalling the tenant data json. Contact admins.")
+				s.loggers.Error.Printf("Request:\n%#v\nError:\n%#v", r, err)
+				return
+			}
+
+			snapshotData.Snapshots = append(snapshotData.Snapshots, marshalledPage)
+		}
+
+		snapshotData.LastPage = lastPage
+		snapshotData.SnapshotCount = len(pageOfSnapshots)
+
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, "The pagination returned an error! Please check that you're expecting this to have this many pages.")
+			s.loggers.Error.Printf("Request:\n%#v\nError:\n%#v", r, err)
+		}
+
+		marshalledData, err := json.Marshal(snapshotData)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, "The system had an issue marshalling the tenant data json. Contact admins.")
+			s.loggers.Error.Printf("Request:\n%#v\nError:\n%#v", r, err)
+			return
+		}
+
+		fmt.Fprintf(w, "%s", marshalledData)
+	}
+
+}
+
+func (s *Server) search() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+
 }
