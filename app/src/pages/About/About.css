@@ -1,0 +1,56 @@
+.column1 {
+    width: 50%;
+    float: left;
+    color: orange;
+}
+
+.column2 {
+    width: 50%;
+    float: right;
+    font-family: Arial;
+}
+
+.body {
+    margin-top: 0px;
+}
+
+.our-team {
+    margin-top: 8px;
+    margin-bottom: 20px;
+    font-family: Arial;
+    font-size: 30px;
+}
+
+.teamMemberPhotos {
+    width: 300px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.paragraphs {
+    margin-bottom: 25px;
+}
+
+.memberNames {
+    margin: 0px;
+    font-family: Arial;
+    color: black;
+    font-size: 20px;
+    font-weight: lighter;
+}
+
+div.item {
+    display: flex;
+    margin-bottom: 30px;
+}
+
+div.item div.image {
+    color: orange;
+    width: 50%;
+}
+
+div.item div.info {
+    font-family: Arial;
+    width: 75%;
+}
