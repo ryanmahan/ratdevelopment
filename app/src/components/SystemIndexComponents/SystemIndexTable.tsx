@@ -14,7 +14,7 @@ function getCapacity(currentRow: any){
 function getWarningImage(currentRow: any) {
     if(Math.trunc(100 * (currentRow.capacity.total.freeTiB / currentRow.capacity.total.sizeTiB)) <= 30){
         return <figure className="image is-24x24 is-pulled-right">
-            <img src="https://img.icons8.com/color/50/000000/high-priority.png" alt="Warning Low Capacity" title= "Warning: Capacity below 30%"></img>
+            <img src="https://img.icons8.com/color/50/000000/high-priority.png" alt="Warning: Free capacity below 30%" title="Warning: Free capacity below 30%"></img>
         </figure>;
     }
 }
