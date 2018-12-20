@@ -6,6 +6,8 @@ import {DateDropdown} from "./SystemView/DateDropdown";
 import {match} from "react-router";
 import {AppAuthState} from "../misc/state/constants";
 let fileDownload = require("js-file-download");
+import {API_URL} from "../misc/state/constants";
+import * as moment from 'moment';
 
 export interface SystemViewProps {
     match: match,
@@ -39,7 +41,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     }
 
     componentDidMount(){
-        fetch("http://localhost:8081/api" +
+        fetch(API_URL + "/api" +
               "/tenants/" +
               "hpe" +
               "/systems/" +
@@ -62,7 +64,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                 selectedDate: date,
                 validDates: j
             });
-            return fetch("http://localhost:8081/api" +
+            return fetch(API_URL + "/api" +
                          "/tenants/" +
                          "hpe" +
                          "/systems/" +
@@ -83,7 +85,7 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
     }
 
     reload(date: string){
-        fetch("http://localhost:8081/api" +
+        fetch(API_URL + "/api" +
               "/tenants/" +
               "hpe" +
               "/systems/" +
@@ -114,8 +116,8 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                            extras={[<DateDropdown reload={this.reload} dates={this.state.validDates} activeDate={this.state.selectedDate}/>]}/>
                 <Divider/>
                 <div className="level">
-                    <div className="level-left">
-                        Date: {date}
+                    <div className="level-left title is-5">
+                        {moment(date).utc().format('MMMM Do YYYY, h:mm A')}
                     </div>
                     <div className="level-right">
                         <a className="button level-item is-large" onClick={this.downloadJSON}>
@@ -138,7 +140,8 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
 
         let xhr: XMLHttpRequest = new XMLHttpRequest();
         xhr.open("GET",
-            "http://localhost:8081/api" +
+            API_URL +
+            "/api" +
             "/tenants/" +
             "hpe" +
             "/systems/" +

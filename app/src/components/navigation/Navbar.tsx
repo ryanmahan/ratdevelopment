@@ -82,7 +82,6 @@ class NavbarComponent extends React.Component<NavbarProps, INavbarState> {
                                 {!this.props.authState.authenticated &&
                                     <div className="dropdown-content">
                                         <Link to="/login" className="dropdown-item">Login</Link>
-                                        <Link to="/login" className="dropdown-item">Register</Link>
                                     </div>
                                 }
                             </div>
