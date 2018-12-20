@@ -1,7 +1,8 @@
 import * as React from "react";
 import '../../sass/custom-bulma.scss';
 import {Link} from "react-router-dom";
-import {API_URL} from "../../misc/state/constants"
+import {API_URL} from "../../misc/state/constants";
+import * as moment from 'moment';
 import {AppAuthState} from "../../misc/state/constants";
 
 //reduced getters to only the helpful ones
@@ -163,7 +164,7 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
                                         </div>
                                     </div>
                                 </td>
-                                <td>{system.date}</td>
+                                <td>{moment(system.date).utc().format('MMMM Do YYYY, h:mm A')}</td>
                             </tr>
                         );
                     })
