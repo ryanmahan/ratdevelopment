@@ -1,6 +1,5 @@
 import * as React from "react";
 import '../../sass/custom-bulma.scss';
-import {Link} from "react-router-dom";
 import {AppAuthState} from "../../misc/state/constants";
 import {Link, withRouter, RouteComponentProps} from "react-router-dom";
 import {API_URL} from "../../misc/state/constants";
