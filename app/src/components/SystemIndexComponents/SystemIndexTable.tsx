@@ -3,6 +3,7 @@ import '../../sass/custom-bulma.scss';
 import {Link, withRouter, RouteComponentProps} from "react-router-dom";
 import {API_URL} from "../../misc/state/constants"
 import * as queryString from "query-string";
+import * as moment from 'moment';
 
 //reduced getters to only the helpful ones
 function getCapacity(currentRow: any){
@@ -200,7 +201,7 @@ class SystemIndexTableComponent extends React.Component<SystemIndexTableProps & 
                                         </div>
                                     </div>
                                 </td>
-                                <td>{system.date}</td>
+                                <td>{moment(system.date).utc().format('MMMM Do YYYY, h:mm A')}</td>
                             </tr>
                         );
                     })
