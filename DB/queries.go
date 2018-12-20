@@ -205,6 +205,6 @@ func (db *DatabaseSession) GetSnapshotPageByTenant(tenant string, pageSize int, 
 	return snapshots, pageReturned, isLastPage, currPageState, nil
 }
 
-func (s *Server) RunPaginatedQuery() {
+// func (s *Server) RunPaginatedQuery() {
 
-}
+// }
