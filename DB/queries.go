@@ -1,15 +1,17 @@
 package DB
 
 import (
+	"fmt"
+	"ratdevelopment/searching"
 	"strconv"
 	"time"
+
 	"github.com/gocql/gocql"
-	"fmt"
 )
 
 //FileBrowserDBSession is an interface for querying the database session
 type FileBrowserDBSession interface {
-	GetLatestSnapshotsByTenant(string) ([]string, error)
+	GetLatestSnapshotsByTenant(string, string) ([]string, error)
 	GetSnapshotByTenantSerialNumberAndDate(string, string, string) (string, error)
 	GetValidTimestampsOfSystem(string, string) ([]time.Time, error)
 	GetSystemsOfTenant(string) ([]string, error)
@@ -19,8 +21,8 @@ type FileBrowserDBSession interface {
 }
 
 //GetLatestSnapshotsByTenant returns slice of JSON blobs for the latest snapshots of all systems owned by a tenant
-func (db *DatabaseSession) GetLatestSnapshotsByTenant(tenant string) ([]string, error) {
-	return db.RunQuery("SELECT snapshot FROM latest_snapshots_by_tenant WHERE tenant = ?", tenant)
+func (db *DatabaseSession) GetLatestSnapshotsByTenant(tenant, searchquery string) ([]string, error) {
+	return db.RunQuery(searching.SearchQueryToCQL(searchquery), tenant)
 }
 
 //GetSystemsOfTenant returns a list of serial numbers a given tenant has access to
