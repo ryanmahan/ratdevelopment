@@ -3,6 +3,7 @@ package DB
 import (
 	"encoding/json"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -26,6 +27,13 @@ func (db *DatabaseSession) InsertSnapshot(jsonBytes []byte) (error){
 func (db *DatabaseSession) insertLatestByTenant(info *map[string]interface{}, jsonBlob *[]byte) (error) {
 
 	serialNum := (*info)["serialNumberInserv"]
+	serialStr := (*info)["serialNumberInserv"].(string)
+
+	company_name := (*info)["system"].(map[string]interface{})["companyName"]
+	company_name_input := ""
+	if company_name != nil {
+		company_name_input = strings.ToLower(company_name.(string))
+	}
 
 	// since the tenants is in an array, nested within tenants, nested within authorized
 	// we have to do first access authorized,
@@ -40,9 +48,9 @@ func (db *DatabaseSession) insertLatestByTenant(info *map[string]interface{}, js
 		// Update the record
 		// if none match the WHERE clause, this creates a new record
 		err := db.Query("UPDATE latest_snapshots_by_tenant " +
-						"SET snapshot = textAsBlob(?)" +
+						"SET snapshot = textAsBlob(?), serial_string = ?, company_name = ?, tenant_search = ? " +
 						"WHERE tenant = ? AND serial_number = ?",
-						*jsonBlob, tenant, serialNum).Exec()
+						*jsonBlob, serialStr, company_name_input, strings.ToLower(tenant), tenant, serialNum).Exec()
 		if err != nil { log.Fatal(err) }
 	}
 
