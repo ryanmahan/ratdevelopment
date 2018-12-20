@@ -7,6 +7,7 @@ import {SystemView} from "../../pages/SystemView";
 import { Error } from "../../pages/Misc/Error";
 import { Logout } from "../../pages/Auth/Logout/Logout";
 import { AppState } from "../../misc/state/reducers/Reducers";
+import { About } from "../../pages/About/about";
 import {
     AUTH_STATUS_LOGGEDIN,
     AUTH_STATUS_ANY,
@@ -25,7 +26,7 @@ export const Router: IRouter[] = [{
     route: "/",
     visible: AUTH_STATUS_LOGGEDIN,
     match: true,
-    main: () => <SystemIndex />
+    main: (props: any) => <SystemIndex {...props} />
 }, {
     route: "/login",
     visible: AUTH_STATUS_GUEST,
@@ -41,6 +42,11 @@ export const Router: IRouter[] = [{
     visible: AUTH_STATUS_LOGGEDIN,
     match: false,
     main: (props: any) => <SystemView {...props} />
+}, {
+    route: "/about",
+    visible: AUTH_STATUS_ANY,
+    match: false,
+    main: () => <About />
 }, {
     route: undefined,
     visible: AUTH_STATUS_ANY,
