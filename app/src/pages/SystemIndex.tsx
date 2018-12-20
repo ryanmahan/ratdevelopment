@@ -6,38 +6,48 @@ import { SystemIndexTable } from "../components/SystemIndexComponents/SystemInde
 import { SearchBar } from "../components/SystemIndexComponents/SearchBar"
 
 //import * as sample from "./SystemViewComponents/SampleSystem.json";
-
+/* function updateState(snapshots) {
+ *     this.setState({snapshots})
+ * }
+ *  */
 export interface SystemIndexProps {
 
 }
 export interface SystemIndexState {
-  snapshotArray: any[]
-  searchString: string
+  snapshots: []
 }
 export class SystemIndex extends React.Component<SystemIndexProps, SystemIndexState> {
 
     constructor(props: SystemIndexProps){
         super(props);
         this.state = {
-            snapshotArray: [],
-            searchString: ""
+            snapshots: [],
         };
         this.handleSearchChange = this.handleSearchChange.bind(this)
     }
 
+    componentDidMount() {
+        this.getSnapshots("")
+    }
+
+    //fetch the latest snapshots and then update the state of the table.
+    getSnapshots(searchstring: string) {
+        //  Make the API call
+        fetch(
+            process.env.API_URL + "/api/tenants/1200944110/snapshots" + (searchstring ? "?searchString=" + searchstring : "")
+        ).then(r => {
+            //  When that returns convert it to json
+            return r.json();
+        }).then(j => {
+            //  Finally set the state of the table to the list of snapshots returned
+            this.setState({
+                snapshots: j
+            })
+        });
+    }
+
   handleSearchChange(query: string) {
-      this.setState({ snapshotArray: [], searchString: query });
-      fetch(
-          process.env.API_URL + "/api/tenants/1200944110/snapshots" + (this.state.searchString ? "?searchString=" + this.state.searchString : "")
-      ).then(r => {
-          //  When that returns convert it to json
-          return r.json();
-      }).then(j => {
-          //  Finally set the state of the table to the list of snapshots returned
-          this.setState({
-              snapshotArray: j,
-          })
-      });
+      this.getSnapshots(encodeURI(query))
   }
 
   render() {
@@ -46,7 +56,7 @@ export class SystemIndex extends React.Component<SystemIndexProps, SystemIndexSt
         <SearchBar handleSearchChange={this.handleSearchChange} />
         <PageTitle title={"Systems"} />
         <Divider />
-        <SystemIndexTable searchstring={this.state.searchString} />
+        <SystemIndexTable snapshots={this.state.snapshots} />
       </div>
     )
   }

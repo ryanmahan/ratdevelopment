@@ -16,11 +16,10 @@ function getWarningImage(currentRow: any) {
 }
 
 export interface SystemIndexTableProps {
-  searchstring: string
+  snapshots: any[]
 }
 
 interface SystemIndexTableState {
-  snapshots: any[]
 }
 
 //exports the actual table component which calls our fillArray method
@@ -28,16 +27,12 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
 
   constructor(props: SystemIndexTableProps) {
     super(props);
-    this.state = { snapshots: [] };
     this.onSortSerial = this.onSortSerial.bind(this);
     this.onSortCompany = this.onSortCompany.bind(this);
     this.onSortCapacity = this.onSortCapacity.bind(this);
     this.onSortDate = this.onSortDate.bind(this);
-  }
-
-  //This is triggered when this component is mounted
-  componentDidMount() {
-    this.getSnapshots(this.props.searchstring)
+      /* updateState = updateState.bind(this) */
+      console.log("yes")
   }
 
   //variables which keep track of the states ordering
@@ -48,7 +43,7 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
 
   //onSort methods take the button click event and will either a)sort the list if unsorted or b)reverse the list if already sorted
   onSortSerial(event: any, sortKey: any) {
-    const snapshots = this.state.snapshots;
+    const snapshots = this.props.snapshots;
     if (this.serialOrder == 0) {
       snapshots.sort((a, b) => a[sortKey].localeCompare(b[sortKey]));
       this.serialOrder = 1;
@@ -63,7 +58,7 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
   }
 
   onSortCompany(event: any, sortKey: any) {
-    const snapshots = this.state.snapshots;
+    const snapshots = this.props.snapshots;
     if (this.companyOrder == 0) {
       snapshots.sort((a, b) => a.system[sortKey].localeCompare(b.system[sortKey]));
       this.serialOrder = 0;
@@ -78,7 +73,7 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
   }
 
   onSortCapacity(event: any, sortKey: any, sortKey2: any) {
-    const snapshots = this.state.snapshots;
+    const snapshots = this.props.snapshots;
     if (this.capacityOrder == 0) {
       snapshots.sort((a, b) => ((a.capacity.total[sortKey] / a.capacity.total[sortKey2]).toString().localeCompare((b.capacity.total[sortKey] / b.capacity.total[sortKey2]).toString())));
       this.serialOrder = 0;
@@ -93,7 +88,7 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
   }
 
   onSortDate(event: any, sortKey: any) {
-    const snapshots = this.state.snapshots;
+    const snapshots = this.props.snapshots;
     if (this.dateOrder == 0) {
       snapshots.sort((a, b) => a[sortKey].localeCompare(b[sortKey]));
       this.serialOrder = 0;
@@ -111,7 +106,8 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
   //instead of an outside function iterating, the body is now rendered in a callback function using map
   //buttons will call sort functions
   render() {
-    let newData = this.state.snapshots;
+    let newData = this.props.snapshots;
+    if ( !newData ) return null
     return (
       <table id={"myTable"} className="table is-fullwidth is-bordered is-striped">
         <thead>
@@ -171,19 +167,4 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
     )
   }
 
-  //fetch the latest snapshots and then update the state of the table.
-  getSnapshots(searchstring: string) {
-    //  Make the API call
-    fetch(
-      process.env.API_URL + "/api/tenants/1200944110/snapshots" + (searchstring ? "?searchString=" + searchstring : "")
-    ).then(r => {
-      //  When that returns convert it to json
-      return r.json();
-    }).then(j => {
-      //  Finally set the state of the table to the list of snapshots returned
-      this.setState({
-        snapshots: j
-      })
-    });
-  }
 }

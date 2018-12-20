@@ -5,8 +5,8 @@ import (
 	"ratdevelopment/searching"
 	"strconv"
 	"time"
-
 	"github.com/gocql/gocql"
+	"regexp"
 )
 
 //FileBrowserDBSession is an interface for querying the database session
@@ -22,6 +22,13 @@ type FileBrowserDBSession interface {
 
 //GetLatestSnapshotsByTenant returns slice of JSON blobs for the latest snapshots of all systems owned by a tenant
 func (db *DatabaseSession) GetLatestSnapshotsByTenant(tenant, searchquery string) ([]string, error) {
+	exp, err := regexp.Compile("^[a-zA-Z0-9\\ \\-\\_]*$")
+	if err != nil {
+		return nil, err
+	}
+	if !exp.MatchString(searchquery) {
+		return nil, fmt.Errorf("Don't do that please")
+	}
 	return db.RunQuery(searching.SearchQueryToCQL(searchquery), tenant)
 }
 
