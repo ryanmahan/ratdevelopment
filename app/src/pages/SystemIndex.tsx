@@ -22,6 +22,7 @@ export class SystemIndex extends React.Component<SystemIndexProps, SystemIndexSt
             snapshotArray: [],
             searchString: ""
         };
+        this.handleSearchChange = this.handleSearchChange.bind(this)
     }
 
   handleSearchChange(query: string) {
@@ -33,7 +34,6 @@ export class SystemIndex extends React.Component<SystemIndexProps, SystemIndexSt
           return r.json();
       }).then(j => {
           //  Finally set the state of the table to the list of snapshots returned
-          console.log(j)
           this.setState({
               snapshotArray: j,
           })
