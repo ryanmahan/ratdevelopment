@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { AppAuthState } from "../../../misc/state/constants";
 import { setState } from "../../../misc/state/actions/Actions";
+import { API_URL } from "../../../misc/state/constants"
 import "./Login.css";
 import auth0 from 'auth0-js';
 
@@ -26,7 +27,7 @@ class LoginComponent extends React.Component<loginProps, loginState> {
       domain: 'rat-dev.auth0.com',
       clientID: 'kGXtSueZuisYoZneXoOOZUm_jJs33lhp',
       responseType: 'token id_token',
-      redirectUri: 'http://localhost:8080/login',
+      redirectUri: API_URL + '/login',
       scope: 'openid'
     });
 
