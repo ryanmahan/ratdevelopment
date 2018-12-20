@@ -28,7 +28,7 @@ export class SystemIndex extends React.Component<SystemIndexProps, SystemIndexSt
   handleSearchChange(query: string) {
       this.setState({ snapshotArray: [], searchString: query });
       fetch(
-          process.env.API_URL + "/api/tenants/1200944110/snapshots" + this.state.searchString ? "?searchString=" + this.state.searchString : ""
+          process.env.API_URL + "/api/tenants/1200944110/snapshots" + (this.state.searchString ? "?searchString=" + this.state.searchString : "")
       ).then(r => {
           //  When that returns convert it to json
           return r.json();
