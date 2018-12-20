@@ -20,15 +20,16 @@ class NavbarComponent extends React.Component<NavbarProps, INavbarState> {
 
     constructor(props: any) {
         super(props);
-        this.toggleDropdown = this.toggleDropdown.bind(this);
+        this.setDropdown = this.setDropdown.bind(this);
         this.state = {
             toggled: false
         };
     }
 
-    toggleDropdown() {
+    setDropdown(state: boolean) {
+        console.log("toggle drop");
         this.setState({
-            toggled: !this.state.toggled
+            toggled: state
         });
     }
 
@@ -63,14 +64,14 @@ class NavbarComponent extends React.Component<NavbarProps, INavbarState> {
                         </Link>
                     </div>
                     <div className="navbar-end">
-                        <div className={"navbar-item level dropdown " + (this.state.toggled ? "is-active" : "")} onClick={() => this.toggleDropdown()} >
-                            <div className="dropdown-trigger">
-                                <Link className="navbar-item level" aria-haspopup="true" aria-controls="dropdown-menu" to="">
+                        <div className={"navbar-item level dropdown " + (this.state.toggled ? "is-active" : "")}>
+                            <div className="dropdown-trigger" onClick={() => this.setDropdown(!this.state.toggled)}>
+                                <a className="navbar-item level" aria-haspopup="true" aria-controls="dropdown-menu">
                                     <span style={{paddingRight: "0.5rem"}}>{displayUser}</span>
                                     <span className="icon">
                                         <i className="fas fa-user-circle fa-2x"/>
                                     </span>
-                                </Link>
+                                </a>
                             </div>
                             <div className="dropdown-menu" id="dropdown-menu" role="menu">
                                 {this.props.authState.authenticated &&

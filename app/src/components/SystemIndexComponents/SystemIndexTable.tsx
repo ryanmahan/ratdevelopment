@@ -1,7 +1,8 @@
 import * as React from "react";
 import '../../sass/custom-bulma.scss';
+import {AppAuthState} from "../../misc/state/constants";
 import {Link, withRouter, RouteComponentProps} from "react-router-dom";
-import {API_URL} from "../../misc/state/constants"
+import {API_URL} from "../../misc/state/constants";
 import * as queryString from "query-string";
 import * as moment from 'moment';
 
@@ -19,10 +20,11 @@ function getWarningImage(currentRow: any) {
 }
 
 export interface SystemIndexTableProps {
+    authState: AppAuthState
     history?: { push(path: string): void }
 }
 
-interface SystemIndexTableState {
+export interface SystemIndexTableState {
     snapshots: any[]
 }
 
@@ -215,7 +217,9 @@ class SystemIndexTableComponent extends React.Component<SystemIndexTableProps & 
     getSnapshots(cb: any) {
         //  Make the API call
         fetch(
-            API_URL + "/api/tenants/1200944110/snapshots"
+            API_URL + "/api/tenants/1200944110/snapshots",{
+                headers:{Authorization: "BEARER "+this.props.authState.access_token}
+            }
         ).then(r => {
             //  When that returns convert it to json
             return r.json();
