@@ -54,7 +54,6 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
     else {
       snapshots.reverse();
     }
-    this.setState({ snapshots });
   }
 
   onSortCompany(event: any, sortKey: any) {
@@ -69,7 +68,6 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
     else {
       snapshots.reverse();
     }
-    this.setState({ snapshots });
   }
 
   onSortCapacity(event: any, sortKey: any, sortKey2: any) {
@@ -84,7 +82,6 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
     else {
       snapshots.reverse();
     }
-    this.setState({ snapshots });
   }
 
   onSortDate(event: any, sortKey: any) {
@@ -99,7 +96,6 @@ export class SystemIndexTable extends React.Component<SystemIndexTableProps, Sys
     else {
       snapshots.reverse();
     }
-    this.setState({ snapshots });
   }
 
   //the table is rendered
