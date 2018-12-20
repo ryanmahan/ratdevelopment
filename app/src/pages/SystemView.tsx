@@ -4,6 +4,7 @@ import {Divider} from "../components/layout/Divider";
 import {PageTitle} from "../components/layout/PageTitle";
 import {DateDropdown} from "./SystemView/DateDropdown";
 import {match} from "react-router";
+import * as moment from 'moment';
 
 export interface SystemViewProps {
     match: match,
@@ -106,8 +107,8 @@ export class SystemView extends React.Component<SystemViewProps, SystemViewState
                            extras={[<DateDropdown reload={this.reload} dates={this.state.validDates} activeDate={this.state.selectedDate}/>]}/>
                 <Divider/>
                 <div className="level">
-                    <div className="level-left">
-                        Date: {date}
+                    <div className="level-left title is-5">
+                        {moment(date).utc().format('MMMM Do YYYY, h:mm A')}
                     </div>
                     <div className="level-right">
                         <h1></h1>
